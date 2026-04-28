@@ -26,26 +26,20 @@
   .dot.done { background: #22c55e; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .cam-body { background: #111; position: relative; min-height: 220px; display: flex; align-items: center; justify-content: center; }
-  #video { width: 100%; display: none; max-height: 300px; object-fit: cover; }
+  .cam-body { background: #111; position: relative; min-height: 240px; display: flex; align-items: center; justify-content: center; }
+  #video { width: 100%; display: none; max-height: 320px; object-fit: cover; }
   #canvas, #proc-canvas { display: none; }
 
   .cam-placeholder { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 2.5rem 2rem; text-align: center; }
   .cam-placeholder p { font-size: 13px; color: #aaa; max-width: 280px; line-height: 1.55; }
-
   .btn-start { padding: 10px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
   .btn-start:hover { background: #1e40af; }
 
-  .scan-overlay { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; pointer-events: none; }
-  .scan-frame { width: 85%; max-width: 400px; height: 110px; border: 1.5px solid rgba(99,179,237,0.65); border-radius: 6px; position: relative; overflow: hidden; }
-  .sf-c { position: absolute; width: 16px; height: 16px; }
-  .sf-c.tl { top:-2px;left:-2px; border-top:2.5px solid #60a5fa; border-left:2.5px solid #60a5fa; border-radius:3px 0 0 0; }
-  .sf-c.tr { top:-2px;right:-2px; border-top:2.5px solid #60a5fa; border-right:2.5px solid #60a5fa; border-radius:0 3px 0 0; }
-  .sf-c.bl { bottom:-2px;left:-2px; border-bottom:2.5px solid #60a5fa; border-left:2.5px solid #60a5fa; border-radius:0 0 0 3px; }
-  .sf-c.br { bottom:-2px;right:-2px; border-bottom:2.5px solid #60a5fa; border-right:2.5px solid #60a5fa; border-radius:0 0 3px 0; }
-  .scan-line { position: absolute; left:0; right:0; height:2px; background: rgba(96,165,250,0.75); animation: scanmove 2s ease-in-out infinite; }
-  @keyframes scanmove { 0%{top:0} 100%{top:100%} }
-  .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.6); pointer-events: none; }
+  /* Scan overlay — darkens everything OUTSIDE the frame */
+  .scan-overlay { position: absolute; inset: 0; display: none; pointer-events: none; }
+  .scan-overlay svg { width: 100%; height: 100%; }
+
+  .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.65); pointer-events: none; }
 
   .status-bar { padding: 9px 16px; font-size: 12px; min-height: 36px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #f0ede6; color: #888; transition: background 0.2s, color 0.2s; }
   .status-bar.ok { color: #16a34a; background: #f0fdf4; }
@@ -54,13 +48,13 @@
   .spinner { width:13px; height:13px; border:1.5px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
-  .preview-wrap { display:none; padding: 0 16px 12px; }
-  .preview-row { display: flex; gap: 10px; }
+  .preview-wrap { display:none; padding: 8px 16px 12px; }
+  .preview-row { display: flex; gap: 8px; }
   .preview-box { flex:1; text-align:center; }
-  .preview-box p { font-size:10px; color:#999; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em; }
-  .preview-box img { width:100%; height:70px; object-fit:cover; border-radius:6px; border:1px solid #e2e0d8; }
+  .preview-box p { font-size:10px; color:#999; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em; }
+  .preview-box img { width:100%; height:80px; object-fit:contain; border-radius:6px; border:1px solid #e2e0d8; background:#f8f8f6; }
 
-  .raw-text-wrap { display: none; margin: 0 16px 12px; padding: 8px 12px; background: #f8f8f6; border: 1px solid #e8e6df; border-radius: 8px; font-size: 11px; color: #555; font-family: monospace; line-height: 1.5; max-height: 70px; overflow-y: auto; }
+  .raw-text-wrap { display: none; margin: 0 16px 12px; padding: 8px 12px; background: #f8f8f6; border: 1px solid #e8e6df; border-radius: 8px; font-size: 11px; color: #555; font-family: monospace; line-height: 1.5; max-height: 80px; overflow-y: auto; }
 
   .section-label { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
@@ -77,7 +71,6 @@
   .btn-save { flex:1; padding:10px 24px; background:#1d4ed8; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
   .btn-save:hover:not(:disabled) { background:#1e40af; }
   .btn-save:disabled { opacity:0.35; cursor:not-allowed; }
-
   #rescan-btn { display:none; background:none; border:none; color:#1d4ed8; font-size:12px; cursor:pointer; text-decoration:underline; }
 </style>
 </head>
@@ -98,30 +91,47 @@
       </div>
     </div>
 
-    <div class="cam-body">
+    <div class="cam-body" id="cam-body">
       <div class="cam-placeholder" id="placeholder">
-        <p>Point camera at address label — hold steady for 2 seconds</p>
+        <p>Place the address label inside the frame — it scans automatically</p>
         <button class="btn-start" onclick="startScanner()">Start scanner</button>
       </div>
       <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas"></canvas>
       <canvas id="proc-canvas"></canvas>
+
+      <!-- SVG overlay: dims area outside the scan box -->
       <div class="scan-overlay" id="overlay">
-        <div class="scan-frame">
-          <div class="sf-c tl"></div><div class="sf-c tr"></div>
-          <div class="sf-c bl"></div><div class="sf-c br"></div>
-          <div class="scan-line"></div>
-        </div>
+        <svg id="overlay-svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <mask id="cutout">
+              <rect width="400" height="300" fill="white"/>
+              <rect id="scan-box" x="40" y="60" width="320" height="180" rx="6" fill="black"/>
+            </mask>
+          </defs>
+          <!-- Dark vignette outside the frame -->
+          <rect width="400" height="300" fill="rgba(0,0,0,0.55)" mask="url(#cutout)"/>
+          <!-- Frame border -->
+          <rect id="frame-border" x="40" y="60" width="320" height="180" rx="6" fill="none" stroke="rgba(96,165,250,0.8)" stroke-width="1.5"/>
+          <!-- Corner accents -->
+          <polyline points="40,90 40,60 70,60" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="330,60 360,60 360,90" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="40,210 40,240 70,240" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="330,240 360,240 360,210" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Animated scan line -->
+          <line id="scan-line" x1="42" y1="60" x2="358" y2="60" stroke="rgba(96,165,250,0.7)" stroke-width="1.5">
+            <animateTransform attributeName="transform" type="translate" from="0,0" to="0,180" dur="2s" repeatCount="indefinite"/>
+          </line>
+        </svg>
       </div>
-      <div class="hint" id="hint" style="display:none">Align label within frame · hold still</div>
+      <div class="hint" id="hint" style="display:none">Fill the label inside the blue frame · hold still</div>
     </div>
 
     <div class="status-bar" id="status-bar"><span id="status-msg">Press start to activate camera</span></div>
-
     <div class="preview-wrap" id="preview-wrap">
       <div class="preview-row">
-        <div class="preview-box"><p>Original</p><img id="prev-original" alt="original"></div>
-        <div class="preview-box"><p>Processed</p><img id="prev-processed" alt="processed"></div>
+        <div class="preview-box"><p>Cropped</p><img id="prev-crop" alt="cropped"></div>
+        <div class="preview-box"><p>Processed (what OCR sees)</p><img id="prev-proc" alt="processed"></div>
       </div>
     </div>
     <div class="raw-text-wrap" id="raw-text"></div>
@@ -129,12 +139,12 @@
 
   <p class="section-label">Detected address</p>
   <div class="form-grid">
-    <div class="field full"><label>Name / recipient</label><input type="text" id="f-name" placeholder="—"></div>
-    <div class="field full"><label>Street / House address</label><input type="text" id="f-street1" placeholder="—"></div>
+    <div class="field full"><label>Name / Recipient</label><input type="text" id="f-name" placeholder="—"></div>
+    <div class="field full"><label>House / Flat no.</label><input type="text" id="f-street1" placeholder="—"></div>
     <div class="field full"><label>Area / Locality</label><input type="text" id="f-street2" placeholder="—"></div>
     <div class="field"><label>City</label><input type="text" id="f-city" placeholder="—"></div>
     <div class="field"><label>State</label><input type="text" id="f-state" placeholder="—"></div>
-    <div class="field"><label>PIN / ZIP code</label><input type="text" id="f-zip" placeholder="—"></div>
+    <div class="field"><label>PIN code</label><input type="text" id="f-zip" placeholder="—"></div>
     <div class="field"><label>Mobile</label><input type="text" id="f-mobile" placeholder="—"></div>
   </div>
 
@@ -148,80 +158,93 @@
 <script>
 let stream = null, scanInterval = null, isScanning = false, populated = false, worker = null;
 
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const procCanvas = document.getElementById('proc-canvas');
-const dot = document.getElementById('dot');
-const liveLabel = document.getElementById('live-label');
-const statusBar = document.getElementById('status-bar');
-const statusMsg = document.getElementById('status-msg');
-const overlay = document.getElementById('overlay');
-const hint = document.getElementById('hint');
+const video    = document.getElementById('video');
+const canvas   = document.getElementById('canvas');
+const procCvs  = document.getElementById('proc-canvas');
+const dot      = document.getElementById('dot');
+const liveLabel= document.getElementById('live-label');
+const statusBar= document.getElementById('status-bar');
+const statusMsg= document.getElementById('status-msg');
+const overlay  = document.getElementById('overlay');
+const hint     = document.getElementById('hint');
 const placeholder = document.getElementById('placeholder');
-const rawTextEl = document.getElementById('raw-text');
+const rawTextEl= document.getElementById('raw-text');
+
+// Scan frame dimensions as fractions of video size (matches SVG box 40,60 → 360,240 in 400x300 space)
+const FRAME = { x: 0.10, y: 0.20, w: 0.80, h: 0.60 };
 
 function setStatus(msg, type) {
-  statusBar.className = 'status-bar' + (type ? ' '+type : '');
-  statusMsg.innerHTML = type === 'scanning' ? '<div class="spinner"></div> '+msg : msg;
+  statusBar.className = 'status-bar'+(type?' '+type:'');
+  statusMsg.innerHTML = type==='scanning' ? '<div class="spinner"></div> '+msg : msg;
 }
 function setDot(state) {
   dot.className = 'dot'+(state?' '+state:'');
   liveLabel.textContent = {live:'live',scanning:'reading...',done:'done'}[state]||'ready';
 }
 
-// ── IMAGE PREPROCESSING ──────────────────────────────────────────
-// Converts camera frame to high-contrast grayscale for better OCR
-function preprocessImage(srcCanvas) {
-  const w = srcCanvas.width, h = srcCanvas.height;
-  procCanvas.width = w * 2;   // 2x upscale for better resolution
-  procCanvas.height = h * 2;
-  const ctx = procCanvas.getContext('2d');
+// ── CROP to scan frame only ───────────────────────────────────────
+function cropFrame() {
+  if (!video.videoWidth) return null;
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const cx = Math.round(FRAME.x * vw);
+  const cy = Math.round(FRAME.y * vh);
+  const cw = Math.round(FRAME.w * vw);
+  const ch = Math.round(FRAME.h * vh);
 
-  // Upscale
+  canvas.width = cw;
+  canvas.height = ch;
+  canvas.getContext('2d').drawImage(video, cx, cy, cw, ch, 0, 0, cw, ch);
+  return canvas;
+}
+
+// ── IMAGE PREPROCESSING ──────────────────────────────────────────
+function preprocess(src) {
+  const scale = 3; // 3x upscale
+  const w = src.width * scale;
+  const h = src.height * scale;
+  procCvs.width = w;
+  procCvs.height = h;
+  const ctx = procCvs.getContext('2d');
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(srcCanvas, 0, 0, w*2, h*2);
+  ctx.drawImage(src, 0, 0, w, h);
 
-  // Get pixel data
-  const imageData = ctx.getImageData(0, 0, w*2, h*2);
-  const data = imageData.data;
+  const id = ctx.getImageData(0, 0, w, h);
+  const d  = id.data;
 
-  for (let i = 0; i < data.length; i += 4) {
-    // Grayscale
-    const gray = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
-
-    // Increase contrast
-    const contrast = 1.8;
-    const factor = (259*(contrast*255+255)) / (255*(259-contrast*255));
-    let c = factor*(gray-128)+128;
-
-    // Sharpen by boosting difference from neighbors (simple threshold)
-    c = c > 128 ? Math.min(255, c * 1.2) : Math.max(0, c * 0.7);
-
-    // Adaptive threshold — make it closer to pure black/white
-    const thresh = c > 145 ? 255 : 0;
-
-    data[i] = data[i+1] = data[i+2] = thresh;
-    data[i+3] = 255;
+  // 1. Grayscale
+  for (let i = 0; i < d.length; i += 4) {
+    const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+    d[i] = d[i+1] = d[i+2] = g;
   }
 
-  ctx.putImageData(imageData, 0, 0);
-  return procCanvas;
+  // 2. Compute mean brightness for adaptive threshold
+  let sum = 0;
+  for (let i = 0; i < d.length; i += 4) sum += d[i];
+  const mean = sum / (d.length / 4);
+  const thresh = mean * 0.85; // slightly below mean → catches dark text on light bg
+
+  // 3. Binarize
+  for (let i = 0; i < d.length; i += 4) {
+    const val = d[i] < thresh ? 0 : 255;
+    d[i] = d[i+1] = d[i+2] = val;
+    d[i+3] = 255;
+  }
+
+  ctx.putImageData(id, 0, 0);
+  return procCvs;
 }
 
 async function initWorker() {
-  setStatus('Loading OCR engine (first time only)...', 'scanning');
+  setStatus('Loading OCR engine (one-time download)...', 'scanning');
   worker = await Tesseract.createWorker('eng', 1, {
     logger: m => {
-      if (m.status === 'recognizing text') {
+      if (m.status === 'recognizing text')
         setStatus('Reading... '+Math.round(m.progress*100)+'%', 'scanning');
-      }
     }
   });
-  // Tesseract settings tuned for address labels
   await worker.setParameters({
-    tessedit_pageseg_mode: '6',      // Assume uniform block of text
-    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,/-#\n',
+    tessedit_pageseg_mode: '6',   // uniform block of text
     preserve_interword_spaces: '1',
   });
 }
@@ -234,40 +257,32 @@ async function startScanner() {
     video.srcObject = stream;
     video.style.display = 'block';
     placeholder.style.display = 'none';
-    overlay.style.display = 'flex';
+    overlay.style.display = 'block';
     hint.style.display = 'block';
     setDot('live');
     await initWorker();
-    setStatus('Scanning every 5s — hold label steady in the frame...');
+    setStatus('Hold the label steady inside the blue frame...');
     scanInterval = setInterval(captureAndScan, 5000);
-    setTimeout(captureAndScan, 2000);
+    setTimeout(captureAndScan, 2500);
   } catch(e) {
     setStatus('Camera access denied — allow camera and refresh.', 'err');
   }
 }
 
-function captureFrame() {
-  if (!video.videoWidth) return null;
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  return canvas;
-}
-
 async function captureAndScan() {
   if (isScanning || populated) return;
-  const frame = captureFrame();
-  if (!frame) return;
+  const cropped = cropFrame();
+  if (!cropped) return;
+
   isScanning = true;
   setDot('scanning');
   setStatus('Processing image...', 'scanning');
 
   // Show previews
-  const prevWrap = document.getElementById('preview-wrap');
-  document.getElementById('prev-original').src = frame.toDataURL();
-  const processed = preprocessImage(frame);
-  document.getElementById('prev-processed').src = processed.toDataURL();
-  prevWrap.style.display = 'block';
+  document.getElementById('prev-crop').src = cropped.toDataURL();
+  const processed = preprocess(cropped);
+  document.getElementById('prev-proc').src = processed.toDataURL();
+  document.getElementById('preview-wrap').style.display = 'block';
 
   try {
     const { data: { text } } = await worker.recognize(processed);
@@ -277,84 +292,91 @@ async function captureAndScan() {
     rawTextEl.textContent = '📄 Raw OCR: ' + cleaned;
 
     if (!cleaned || cleaned.length < 8) {
-      setDot('live'); setStatus('No text found — hold label closer and steady', 'warn');
+      setDot('live');
+      setStatus('No text found — bring label closer and hold still', 'warn');
       isScanning = false; return;
     }
 
     const parsed = parseIndianAddress(cleaned);
     if (!parsed.street1 && !parsed.city && !parsed.zip) {
-      setDot('live'); setStatus('Text found but address unclear — try again', 'warn');
+      setDot('live');
+      setStatus('Text found but address unclear — try again', 'warn');
     } else {
       populateForm(parsed);
     }
   } catch(e) {
-    setDot('live'); setStatus('OCR error — retrying...', 'err');
+    setDot('live');
+    setStatus('OCR error — retrying...', 'err');
   }
   isScanning = false;
 }
 
-// ── ADDRESS PARSER (tuned for Indian labels) ──────────────────────
+// ── ADDRESS PARSER tuned for Indian shipping labels ───────────────
 function parseIndianAddress(text) {
-  const result = { name:'', street1:'', street2:'', city:'', state:'', zip:'', mobile:'' };
+  const r = { name:'', street1:'', street2:'', city:'', state:'', zip:'', mobile:'' };
   const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
 
   lines.forEach(line => {
-    const l = line.toLowerCase();
+    const lo = line.toLowerCase();
 
-    // PIN code (6 digits for India, 5 for US)
-    const pinMatch = line.match(/\b(\d{6}|\d{5}(?:-\d{4})?)\b/);
-    if (pinMatch && !result.zip) result.zip = pinMatch[1];
+    // PIN code — 6 digits
+    const pin = line.match(/\b(\d{6})\b/);
+    if (pin && !r.zip) r.zip = pin[1];
 
-    // Mobile number (10 digits, possibly with country code)
-    const mobMatch = line.match(/(?:mobile[^0-9]*|number[^0-9]*)?(\+?91[-\s]?)?([6-9]\d{9})/i);
-    if (mobMatch && !result.mobile) result.mobile = mobMatch[2];
+    // Mobile — 10 digits starting 6-9, with optional country code
+    const mob = line.match(/(?:mobile[^0-9]*|number[^0-9]*|\+?91[-\s]?)?([6-9]\d{9})/i);
+    if (mob && !r.mobile) r.mobile = mob[1];
 
-    // State (handles "state up", "state: maharashtra" etc)
-    const stateMatch = line.match(/state[^a-z]*([a-z\s]+)/i);
-    if (stateMatch && !result.state) result.state = stateMatch[1].trim();
+    // State — "State up" / "State: Maharashtra"
+    const stMatch = line.match(/state[^a-z]*([a-z\s]+)/i);
+    if (stMatch && !r.state) r.state = stMatch[1].trim();
 
-    // House/flat number line
-    if (/house|flat|plot|door|h\.?no|f\.?no|villa|block/i.test(l) && !result.street1) {
-      result.street1 = line.replace(/house no\.?\s*[-:]/i,'House No. ').trim();
-    }
+    // House / flat
+    if (/house|flat|plot|door|h\.?no|villa|block/i.test(lo) && !r.street1)
+      r.street1 = line.replace(/house\s*no\s*[-:]/i,'House No.').trim();
 
-    // Area/locality line
-    if (/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|extension|phase)/i.test(l) && !result.street2) {
-      result.street2 = line.trim();
-    }
+    // Area / locality
+    if (/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|phase|devipura|vijay)/i.test(lo) && !r.street2)
+      r.street2 = line.trim();
 
-    // City — after PIN or standalone known city pattern
-    if (pinMatch && !result.city) {
-      const cityGuess = line.replace(pinMatch[0],'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
-      if (cityGuess.length > 2) result.city = cityGuess;
+    // City — repeated standalone city name (common in Indian labels)
+    if (pin && !r.city) {
+      const guess = line.replace(pin[0],'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
+      if (guess.length > 2) r.city = guess;
     }
   });
 
-  // Name — first line that's not an address keyword
-  for (const line of lines) {
-    const l = line.toLowerCase();
-    if (!/house|flat|plot|pin|state|mobile|order|no\.|nagar|colony|\d{6}|\d{10}/.test(l) && line.length > 3) {
-      result.name = line; break;
-    }
-  }
-
-  // City fallback — line containing PIN if city still empty
-  if (!result.city && result.zip) {
-    for (const line of lines) {
-      if (line.includes(result.zip)) {
-        const c = line.replace(result.zip,'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
-        if (c.length > 2) result.city = c;
+  // City fallback — look for line that has the PIN city
+  if (!r.city && r.zip) {
+    lines.forEach(line => {
+      if (line.includes(r.zip)) {
+        const c = line.replace(r.zip,'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
+        if (c.length > 2 && !r.city) r.city = c;
       }
+    });
+  }
+
+  // City second fallback — standalone city line (e.g. "Bulandshahr" repeated)
+  if (!r.city && r.street2) {
+    lines.forEach(line => {
+      if (line.toLowerCase().includes(r.street2.toLowerCase().split(' ').pop()) && line !== r.street2 && !r.city)
+        r.city = line.trim();
+    });
+  }
+
+  // Name — first meaningful line that doesn't match address keywords
+  for (const line of lines) {
+    if (!/house|flat|plot|pin|state|mobile|order|ordee|no\.|nagar|colony|\d{6}|\d{10}|devipura/i.test(line) && line.length > 3) {
+      r.name = line; break;
     }
   }
 
-  // Clean up
-  Object.keys(result).forEach(k => { result[k] = result[k].replace(/\s+/g,' ').trim(); });
-  return result;
+  Object.keys(r).forEach(k => { r[k] = r[k].replace(/\s+/g,' ').trim(); });
+  return r;
 }
 
 function populateForm(addr) {
-  const map = { 'f-name':addr.name, 'f-street1':addr.street1, 'f-street2':addr.street2, 'f-city':addr.city, 'f-state':addr.state, 'f-zip':addr.zip, 'f-mobile':addr.mobile };
+  const map = { 'f-name':addr.name,'f-street1':addr.street1,'f-street2':addr.street2,'f-city':addr.city,'f-state':addr.state,'f-zip':addr.zip,'f-mobile':addr.mobile };
   Object.entries(map).forEach(([id,val]) => {
     const el = document.getElementById(id);
     if (el && val) { el.value = val; el.classList.add('filled'); }
@@ -398,7 +420,9 @@ function clearAll() {
 }
 
 function saveAddress() {
-  alert('Saved:\n' + ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile'].map(id => document.getElementById(id).value).filter(Boolean).join('\n'));
+  const lines = ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile']
+    .map(id => document.getElementById(id).value).filter(Boolean).join('\n');
+  alert('Saved:\n\n' + lines);
 }
 </script>
 </body>
