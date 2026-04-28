@@ -16,22 +16,25 @@
   h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
   .subtitle { font-size: 13px; color: #888; margin-bottom: 1rem; }
 
+  /* TABS */
+  .tabs { display: flex; gap: 0; margin-bottom: 1rem; background: #e8e6df; border-radius: 10px; padding: 3px; }
+  .tab { flex: 1; padding: 8px; text-align: center; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; color: #888; border: none; background: none; transition: all 0.15s; }
+  .tab.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  /* CARD */
   .cam-card { background: #fff; border-radius: 14px; border: 1px solid #e2e0d8; overflow: hidden; margin-bottom: 1rem; }
   .cam-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid #f0ede6; }
   .cam-title { font-size: 13px; font-weight: 600; }
   .live-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; font-weight: 500; background: #f5f4f0; border-radius: 20px; padding: 4px 10px; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
-  .dot.live     { background: #22c55e; animation: pulse 1.5s infinite; }
+  .dot.live { background: #22c55e; animation: pulse 1.5s infinite; }
   .dot.scanning { background: #f59e0b; animation: pulse 0.7s infinite; }
-  .dot.done     { background: #22c55e; }
+  .dot.done { background: #22c55e; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .cam-body {
-    background: #111; position: relative;
-    min-height: 420px; display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-  }
-  #video { width: 100%; display: none; max-height: 520px; object-fit: cover; pointer-events: none; }
+  /* CAMERA VIEW — tall portrait */
+  .cam-body { background: #111; position: relative; min-height: 480px; display: flex; align-items: center; justify-content: center; }
+  #video { width: 100%; display: none; height: 480px; object-fit: cover; }
   #canvas { display: none; }
 
   .cam-placeholder { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 3rem 2rem; text-align: center; }
@@ -39,33 +42,21 @@
   .btn-start { padding: 10px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
   .btn-start:hover { background: #1e40af; }
 
-  /* Portrait scan overlay */
+  /* UPLOAD VIEW */
+  .upload-body { padding: 2rem 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .drop-zone { width: 100%; border: 2px dashed #d0cdc4; border-radius: 12px; padding: 2rem 1rem; text-align: center; cursor: pointer; transition: all 0.15s; background: #fafaf8; }
+  .drop-zone:hover, .drop-zone.dragging { border-color: #3b82f6; background: #eff6ff; }
+  .drop-zone p { font-size: 13px; color: #999; margin-top: 8px; }
+  .drop-zone strong { font-size: 14px; color: #555; display: block; }
+  #file-input { display: none; }
+  #upload-preview { display: none; width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; border: 1px solid #e2e0d8; }
+  .btn-scan-upload { padding: 10px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: none; }
+  .btn-scan-upload:hover { background: #1e40af; }
+
+  /* SCAN OVERLAY — tall vertical rectangle */
   .scan-overlay { position: absolute; inset: 0; display: none; pointer-events: none; }
   .scan-overlay svg { width: 100%; height: 100%; }
-
-  /* Big tap-to-scan button at bottom of camera */
-  .tap-btn-wrap {
-    display: none; position: absolute; bottom: 16px; left: 0; right: 0;
-    justify-content: center; pointer-events: all;
-  }
-  .tap-btn {
-    background: rgba(255,255,255,0.92); border: none; border-radius: 50px;
-    padding: 11px 28px; font-size: 14px; font-weight: 700; color: #1d4ed8;
-    cursor: pointer; box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-    display: flex; align-items: center; gap: 8px;
-    transition: transform 0.1s, background 0.15s;
-  }
-  .tap-btn:active { transform: scale(0.95); background: #e0e7ff; }
-  .tap-btn svg { width: 18px; height: 18px; }
-
-  /* Flash effect on capture */
-  .flash {
-    position: absolute; inset: 0; background: white;
-    opacity: 0; pointer-events: none; transition: opacity 0.05s;
-  }
-  .flash.go { opacity: 0.7; }
-
-  .hint { position: absolute; top: 12px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.7); pointer-events: none; }
+  .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.65); pointer-events: none; }
 
   .status-bar { padding: 9px 16px; font-size: 12px; min-height: 36px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #f0ede6; color: #888; transition: background 0.2s, color 0.2s; }
   .status-bar.ok   { color: #16a34a; background: #f0fdf4; }
@@ -74,13 +65,9 @@
   .spinner { width:13px; height:13px; border:1.5px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
-  /* Preview of what OCR actually processed */
-  .preview-wrap { display:none; padding:8px 16px 4px; }
-  .preview-label { font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
-  .preview-wrap img { width:100%; max-height:120px; object-fit:contain; border-radius:6px; border:1px solid #e2e0d8; background:#f8f8f6; }
+  .raw-text-wrap { display:none; margin:0 16px 12px; padding:8px 12px; background:#f8f8f6; border:1px solid #e8e6df; border-radius:8px; font-size:11px; color:#555; font-family:monospace; line-height:1.5; max-height:80px; overflow-y:auto; }
 
-  .raw-text-wrap { display:none; margin:6px 16px 12px; padding:8px 12px; background:#f8f8f6; border:1px solid #e8e6df; border-radius:8px; font-size:11px; color:#555; font-family:monospace; line-height:1.5; max-height:80px; overflow-y:auto; }
-
+  /* FORM */
   .section-label { font-size:11px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
   .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.25rem; }
   .full { grid-column:1/-1; }
@@ -105,11 +92,17 @@
 <body>
 <div class="app">
   <h1>Address Scanner</h1>
-  <p class="subtitle">100% free · No API key · Tap to scan when label is in focus</p>
+  <p class="subtitle">100% free · No API key · Works offline</p>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('camera')">📷 Camera</button>
+    <button class="tab" onclick="switchTab('upload')">🖼 Upload image</button>
+  </div>
 
   <div class="cam-card">
     <div class="cam-header">
-      <span class="cam-title">Camera</span>
+      <span class="cam-title" id="card-title">Live camera</span>
       <div style="display:flex;align-items:center;gap:10px;">
         <button id="rescan-btn" onclick="rescan()">Scan again</button>
         <div class="live-pill">
@@ -119,52 +112,57 @@
       </div>
     </div>
 
-    <div class="cam-body" id="cam-body">
-      <div class="cam-placeholder" id="placeholder">
-        <p>Point camera at the label, wait for it to focus, then tap the Scan button</p>
-        <button class="btn-start" onclick="startScanner()">Start camera</button>
-      </div>
+    <!-- CAMERA TAB -->
+    <div id="tab-camera">
+      <div class="cam-body">
+        <div class="cam-placeholder" id="placeholder">
+          <p>Place the label inside the frame — fills automatically</p>
+          <button class="btn-start" onclick="startScanner()">Start scanner</button>
+        </div>
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="canvas"></canvas>
 
-      <video id="video" autoplay playsinline muted></video>
-      <canvas id="canvas"></canvas>
-
-      <!-- Portrait frame — matches shipping label shape -->
-      <div class="scan-overlay" id="overlay">
-        <svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <mask id="cutout">
-              <rect width="400" height="600" fill="white"/>
-              <rect x="60" y="40" width="280" height="520" rx="12" fill="black"/>
-            </mask>
-          </defs>
-          <rect width="400" height="600" fill="rgba(0,0,0,0.55)" mask="url(#cutout)"/>
-          <rect x="60" y="40" width="280" height="520" rx="12" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="1.5"/>
-          <polyline points="60,85 60,40 105,40"    fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <polyline points="295,40 340,40 340,85"   fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <polyline points="60,515 60,560 105,560"  fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <polyline points="295,560 340,560 340,515" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <div class="hint" id="hint" style="display:none">Fit the full label inside the frame</div>
-      <div class="flash" id="flash"></div>
-
-      <!-- Tap to scan button -->
-      <div class="tap-btn-wrap" id="tap-btn-wrap">
-        <button class="tap-btn" onclick="doScan()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <!-- Tall vertical scan frame -->
+        <div class="scan-overlay" id="overlay">
+          <svg viewBox="0 0 300 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <mask id="cutout">
+                <rect width="300" height="500" fill="white"/>
+                <rect x="30" y="30" width="240" height="440" rx="12" fill="black"/>
+              </mask>
+            </defs>
+            <rect width="300" height="500" fill="rgba(0,0,0,0.62)" mask="url(#cutout)"/>
+            <rect x="30" y="30" width="240" height="440" rx="12" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="1.5"/>
+            <!-- Corner accents -->
+            <polyline points="30,70 30,30 70,30"   fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+            <polyline points="230,30 270,30 270,70" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+            <polyline points="30,430 30,470 70,470" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+            <polyline points="230,470 270,470 270,430" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+            <!-- Scan line -->
+            <line x1="32" y1="30" x2="268" y2="30" stroke="rgba(96,165,250,0.8)" stroke-width="2">
+              <animateTransform attributeName="transform" type="translate" from="0,0" to="0,440" dur="2.5s" repeatCount="indefinite"/>
+            </line>
           </svg>
-          Scan label
-        </button>
+        </div>
+        <div class="hint" id="hint" style="display:none">Fit entire label inside frame · hold very still</div>
       </div>
     </div>
 
-    <div class="status-bar" id="status-bar"><span id="status-msg">Press "Start camera" to begin</span></div>
-    <div class="preview-wrap" id="preview-wrap">
-      <div class="preview-label">What OCR processed</div>
-      <img id="preview-img" alt="processed">
+    <!-- UPLOAD TAB -->
+    <div id="tab-upload" style="display:none">
+      <div class="upload-body">
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <strong>Tap to choose image</strong>
+          <p>or drag & drop a label photo here</p>
+        </div>
+        <input type="file" id="file-input" accept="image/*">
+        <img id="upload-preview" alt="label preview">
+        <button class="btn-scan-upload" id="btn-scan-upload" onclick="scanUploadedImage()">Scan this image</button>
+      </div>
     </div>
+
+    <div class="status-bar" id="status-bar"><span id="status-msg">Press start to activate camera</span></div>
     <div class="raw-text-wrap" id="raw-text"></div>
   </div>
 
@@ -192,110 +190,192 @@
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-let stream = null, isScanning = false, populated = false, worker = null;
+let stream = null, scanInterval = null, isScanning = false, populated = false, worker = null;
+let currentTab = 'camera';
+let uploadedImageData = null;
 
-const video       = document.getElementById('video');
-const canvas      = document.getElementById('canvas');
-const dot         = document.getElementById('dot');
-const liveLabel   = document.getElementById('live-label');
-const statusBar   = document.getElementById('status-bar');
-const statusMsg   = document.getElementById('status-msg');
-const overlay     = document.getElementById('overlay');
-const hint        = document.getElementById('hint');
-const placeholder = document.getElementById('placeholder');
-const rawTextEl   = document.getElementById('raw-text');
-const flash       = document.getElementById('flash');
-const tapBtnWrap  = document.getElementById('tap-btn-wrap');
+const video      = document.getElementById('video');
+const canvas     = document.getElementById('canvas');
+const dot        = document.getElementById('dot');
+const liveLabel  = document.getElementById('live-label');
+const statusBar  = document.getElementById('status-bar');
+const statusMsg  = document.getElementById('status-msg');
+const overlay    = document.getElementById('overlay');
+const hint       = document.getElementById('hint');
+const placeholder= document.getElementById('placeholder');
+const rawTextEl  = document.getElementById('raw-text');
 
-// Crop to portrait frame (SVG: x=15%, y=6.7%, w=70%, h=86.7%)
-const FRAME = { x:0.15, y:0.067, w:0.70, h:0.867 };
+// Crop to portrait frame (SVG: x=10%, y=6%, w=80%, h=88%)
+const FRAME = { x:0.10, y:0.06, w:0.80, h:0.88 };
 
+// ── TABS ──────────────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='camera')||(i===1&&tab==='upload')));
+  document.getElementById('tab-camera').style.display = tab==='camera' ? 'block' : 'none';
+  document.getElementById('tab-upload').style.display = tab==='upload' ? 'block' : 'none';
+  document.getElementById('card-title').textContent = tab==='camera' ? 'Live camera' : 'Upload image';
+  if (tab==='upload') setStatus('Choose an image of the label to scan');
+  else setStatus('Press start to activate camera');
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────
+const fileInput = document.getElementById('file-input');
+const dropZone  = document.getElementById('drop-zone');
+const uploadPreview = document.getElementById('upload-preview');
+const btnScanUpload = document.getElementById('btn-scan-upload');
+
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragging'); });
+dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('dragging'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragging');
+  if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+});
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    uploadPreview.src = ev.target.result;
+    uploadPreview.style.display = 'block';
+    btnScanUpload.style.display = 'block';
+    uploadedImageData = ev.target.result;
+    setStatus('Image loaded — tap "Scan this image"');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function scanUploadedImage() {
+  if (!uploadedImageData) return;
+  setDot('scanning');
+  setStatus('Scanning uploaded image...', 'scanning');
+  await ensureWorker();
+
+  // Draw image to canvas for preprocessing
+  const img = new Image();
+  img.onload = async () => {
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    c.getContext('2d').drawImage(img, 0, 0);
+    const processed = preprocessCanvas(c);
+    await runOCR(processed);
+  };
+  img.src = uploadedImageData;
+}
+
+// ── STATUS & DOT ──────────────────────────────────────────────────
 function setStatus(msg, type) {
   statusBar.className = 'status-bar'+(type?' '+type:'');
-  statusMsg.innerHTML = type==='scanning'
-    ? '<div class="spinner"></div> '+msg : msg;
+  statusMsg.innerHTML = type==='scanning' ? '<div class="spinner"></div> '+msg : msg;
 }
 function setDot(state) {
   dot.className = 'dot'+(state?' '+state:'');
-  liveLabel.textContent = {live:'live', scanning:'reading...', done:'done'}[state]||'ready';
-}
-
-// ── SHARPNESS DETECTION ───────────────────────────────────────────
-// Measures image sharpness using Laplacian variance — low = blurry
-function measureSharpness(cvs) {
-  const ctx = cvs.getContext('2d');
-  const w = cvs.width, h = cvs.height;
-  // Sample center region only
-  const sx = Math.round(w*0.25), sy = Math.round(h*0.25);
-  const sw = Math.round(w*0.5),  sh = Math.round(h*0.5);
-  const id = ctx.getImageData(sx, sy, sw, sh);
-  const d = id.data;
-  // Convert to grayscale
-  const gray = [];
-  for (let i = 0; i < d.length; i+=4)
-    gray.push(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
-  // Laplacian
-  let sum = 0, count = 0;
-  for (let y = 1; y < sh-1; y++) {
-    for (let x = 1; x < sw-1; x++) {
-      const i = y*sw+x;
-      const lap = Math.abs(-gray[i-sw-1] - gray[i-sw] - gray[i-sw+1]
-                           - gray[i-1]   + 8*gray[i]   - gray[i+1]
-                           - gray[i+sw-1]- gray[i+sw]  - gray[i+sw+1]);
-      sum += lap; count++;
-    }
-  }
-  return count > 0 ? sum/count : 0;
+  liveLabel.textContent = {live:'live',scanning:'reading...',done:'done'}[state]||'ready';
 }
 
 // ── PREPROCESSING ─────────────────────────────────────────────────
-// If image is sharp: apply full preprocessing (grayscale + adaptive threshold)
-// If image is blurry: use raw image (preprocessing makes blurry worse)
-function preprocessFrame(srcCanvas, sharpness) {
-  const out = document.createElement('canvas');
+function preprocessCanvas(src) {
   const scale = 2;
-  out.width  = srcCanvas.width  * scale;
-  out.height = srcCanvas.height * scale;
+  const w = src.width * scale, h = src.height * scale;
+  const out = document.createElement('canvas');
+  out.width = w; out.height = h;
   const ctx = out.getContext('2d');
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(srcCanvas, 0, 0, out.width, out.height);
+  ctx.drawImage(src, 0, 0, w, h);
 
-  // Only binarize if image is sharp enough (sharpness > 8 is decent)
-  if (sharpness > 8) {
-    const id = ctx.getImageData(0, 0, out.width, out.height);
-    const d = id.data;
-    // Grayscale
-    for (let i = 0; i < d.length; i+=4) {
-      const g = Math.round(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
-      d[i] = d[i+1] = d[i+2] = g;
-    }
-    // Adaptive threshold
-    let sum = 0;
-    for (let i = 0; i < d.length; i+=4) sum += d[i];
-    const thresh = (sum / (d.length/4)) * 0.85;
-    for (let i = 0; i < d.length; i+=4) {
-      const v = d[i] < thresh ? 0 : 255;
-      d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255;
-    }
-    ctx.putImageData(id, 0, 0);
+  const id = ctx.getImageData(0, 0, w, h);
+  const d  = id.data;
+
+  // Grayscale
+  for (let i = 0; i < d.length; i+=4) {
+    const g = Math.round(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
+    d[i] = d[i+1] = d[i+2] = g;
   }
+
+  // Adaptive threshold based on mean brightness
+  let sum = 0;
+  for (let i = 0; i < d.length; i+=4) sum += d[i];
+  const thresh = (sum / (d.length/4)) * 0.85;
+  for (let i = 0; i < d.length; i+=4) {
+    const v = d[i] < thresh ? 0 : 255;
+    d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255;
+  }
+
+  ctx.putImageData(id, 0, 0);
   return out;
 }
 
-// ── DIGIT / OCR ERROR CORRECTION ─────────────────────────────────
-function fixPhoneNumber(str) {
-  return str
-    .replace(/[oO]/g,'0').replace(/[iIlL|!]/g,'1').replace(/[zZ]/g,'2')
-    .replace(/[gqG]/g,'9').replace(/[bB]/g,'8').replace(/[sS]/g,'5')
-    .replace(/[^0-9]/g,'');
+// ── CONFIDENCE FILTER — key fix for random words ──────────────────
+// Tesseract.js doesn't expose per-word confidence in recognize(),
+// so we use hOCR output to extract confidence and filter < 60
+async function runOCRWithConfidence(processedCanvas) {
+  const { data } = await worker.recognize(processedCanvas, {}, { hocr: true });
+  const hocr = data.hocr || '';
+
+  // Parse confidence from hOCR: title="bbox ... ; x_wconf NN"
+  const lines = [];
+  const lineRegex = /<span class='ocr_line'[^>]*>(.*?)<\/span>/gs;
+  const wordRegex = /<span class='ocrx_word'[^>]*x_wconf (\d+)[^>]*>(.*?)<\/span>/g;
+
+  let lineMatch;
+  while ((lineMatch = lineRegex.exec(hocr)) !== null) {
+    const lineContent = lineMatch[1];
+    const words = [];
+    let wordMatch;
+    while ((wordMatch = wordRegex.exec(lineContent)) !== null) {
+      const conf = parseInt(wordMatch[1]);
+      const word = wordMatch[2].replace(/<[^>]+>/g, '').trim();
+      if (word && conf >= 60) words.push(word); // ← drop anything below 60% confidence
+    }
+    if (words.length > 0) lines.push(words.join(' '));
+  }
+
+  return lines.join('\n');
 }
 
-async function initWorker() {
-  setStatus('Loading OCR engine (one-time download)...', 'scanning');
+async function runOCR(processedCanvas) {
+  try {
+    let text;
+    try {
+      text = await runOCRWithConfidence(processedCanvas);
+    } catch(e) {
+      // fallback to plain text if hOCR parse fails
+      const { data } = await worker.recognize(processedCanvas);
+      text = data.text;
+    }
+
+    const cleaned = text.trim();
+    rawTextEl.style.display = 'block';
+    rawTextEl.textContent = '📄 Raw: ' + cleaned;
+
+    if (!cleaned || cleaned.length < 8) {
+      setDot('live');
+      setStatus('No text — bring label closer and hold very still', 'warn');
+      isScanning = false; return;
+    }
+
+    const parsed = parseIndianAddress(cleaned);
+    if (!parsed.name && !parsed.city && !parsed.zip) {
+      setDot('live');
+      setStatus('Text found but address unclear — try again', 'warn');
+    } else {
+      populateForm(parsed);
+    }
+  } catch(e) {
+    setDot('live');
+    setStatus('OCR error — retrying...', 'err');
+  }
+  isScanning = false;
+}
+
+// ── WORKER INIT ───────────────────────────────────────────────────
+async function ensureWorker() {
+  if (worker) return;
+  setStatus('Loading OCR engine (one-time)...', 'scanning');
   worker = await Tesseract.createWorker('eng', 1, {
     logger: m => {
-      if (m.status==='recognizing text')
+      if (m.status === 'recognizing text')
         setStatus('Reading... '+Math.round(m.progress*100)+'%', 'scanning');
     }
   });
@@ -306,6 +386,7 @@ async function initWorker() {
   });
 }
 
+// ── CAMERA ────────────────────────────────────────────────────────
 async function startScanner() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({
@@ -316,10 +397,11 @@ async function startScanner() {
     placeholder.style.display = 'none';
     overlay.style.display = 'block';
     hint.style.display = 'block';
-    tapBtnWrap.style.display = 'flex';
     setDot('live');
-    await initWorker();
-    setStatus('Label in frame? Tap "Scan label" when it looks sharp and clear.');
+    await ensureWorker();
+    setStatus('Hold label inside the frame — scanning every 5s...');
+    scanInterval = setInterval(captureAndScan, 5000);
+    setTimeout(captureAndScan, 2500);
   } catch(e) {
     setStatus('Camera access denied — allow camera and refresh.', 'err');
   }
@@ -335,87 +417,44 @@ function cropToFrame() {
   return canvas;
 }
 
-async function doScan() {
+async function captureAndScan() {
   if (isScanning || populated) return;
-
-  // Flash effect
-  flash.classList.add('go');
-  setTimeout(() => flash.classList.remove('go'), 150);
-
   const cropped = cropToFrame();
   if (!cropped) return;
-
   isScanning = true;
-  tapBtnWrap.style.display = 'none';
   setDot('scanning');
-
-  // Measure sharpness and decide preprocessing
-  const sharpness = measureSharpness(cropped);
-  const processed = preprocessFrame(cropped, sharpness);
-
-  // Show preview
-  document.getElementById('preview-wrap').style.display = 'block';
-  document.getElementById('preview-img').src = processed.toDataURL();
-
-  setStatus('Reading text...', 'scanning');
-
-  try {
-    const { data: { text, confidence } } = await worker.recognize(processed);
-    const cleaned = text.trim();
-
-    rawTextEl.style.display = 'block';
-    rawTextEl.textContent = `📄 Sharpness: ${sharpness.toFixed(1)} · Confidence: ${confidence.toFixed(0)}%\n${cleaned}`;
-
-    if (!cleaned || cleaned.length < 8) {
-      setDot('live');
-      setStatus('No text found — bring label closer and tap again', 'warn');
-      tapBtnWrap.style.display = 'flex';
-      isScanning = false; return;
-    }
-
-    if (confidence < 40) {
-      setDot('live');
-      setStatus(`Low confidence (${confidence.toFixed(0)}%) — label may be blurry. Try again.`, 'warn');
-      tapBtnWrap.style.display = 'flex';
-      isScanning = false; return;
-    }
-
-    const parsed = parseIndianAddress(cleaned);
-    if (!parsed.name && !parsed.city && !parsed.zip) {
-      setDot('live');
-      setStatus('Text found but address unclear — try again', 'warn');
-      tapBtnWrap.style.display = 'flex';
-    } else {
-      populateForm(parsed);
-    }
-  } catch(e) {
-    setDot('live');
-    setStatus('OCR error — try again', 'err');
-    tapBtnWrap.style.display = 'flex';
-  }
-  isScanning = false;
+  setStatus('Processing image...', 'scanning');
+  const processed = preprocessCanvas(cropped);
+  await runOCR(processed);
 }
 
-// ── ADDRESS PARSER tuned for Indian shipping labels ───────────────
+// ── DIGIT CORRECTION for phone numbers ───────────────────────────
+function fixPhoneNumber(str) {
+  return str
+    .replace(/[oO]/g,'0').replace(/[iIlL|!]/g,'1').replace(/[zZ]/g,'2')
+    .replace(/[gqG]/g,'9').replace(/[bB]/g,'8').replace(/[sS]/g,'5')
+    .replace(/[^0-9]/g,'');
+}
+
+// ── ADDRESS PARSER ────────────────────────────────────────────────
 function parseIndianAddress(text) {
   const r = { name:'', street1:'', street2:'', city:'', state:'', zip:'', mobile:'' };
   const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
   const used = new Set();
 
   lines.forEach((line, i) => {
-    // PIN code — 6 digits
+    // PIN — 6 digits
     const pin = line.match(/\b(\d{6})\b/);
-    if (pin && !r.zip) { r.zip = pin[1]; used.add(i); }
+    if (pin && !r.zip) { r.zip = pin[1]; }
 
-    // Mobile — fix common OCR digit errors
+    // Mobile — fix OCR digit errors
     const mobRaw = line.match(/(?:mobile|number|mob|ph)[^0-9a-z]*([a-zA-Z0-9]{8,})/i);
     if (mobRaw && !r.mobile) {
       const fixed = fixPhoneNumber(mobRaw[1]);
       if (fixed.length >= 10) { r.mobile = fixed.slice(-10); used.add(i); }
     }
-    // Standalone number line (line after "Mobile number -")
-    if (!r.mobile && /^[a-zA-Z0-9]{8,13}$/.test(line.replace(/\s/g,''))) {
-      const fixed = fixPhoneNumber(line.replace(/\s/g,''));
+    if (!r.mobile && /^[a-zA-Z0-9\s]{9,13}$/.test(line) && /\d{5,}/.test(line)) {
+      const fixed = fixPhoneNumber(line);
       if (fixed.length >= 10) { r.mobile = fixed.slice(-10); used.add(i); }
     }
 
@@ -440,7 +479,7 @@ function parseIndianAddress(text) {
     }
   });
 
-  // City fallback — standalone short proper-noun line
+  // City fallback — standalone capitalized word not yet used
   if (!r.city) {
     lines.forEach((line, i) => {
       if (!used.has(i) && !r.city && line.length > 3 && line.length < 25
@@ -451,11 +490,13 @@ function parseIndianAddress(text) {
     });
   }
 
-  // Name — first unused meaningful line
+  // Name — first unused non-keyword line
   for (let i = 0; i < lines.length; i++) {
-    if (!used.has(i) && !r.name && lines[i].length > 3
-        && !/pin|state|mobile|order|ordee|\d{4}/i.test(lines[i])) {
-      r.name = lines[i]; break;
+    if (!used.has(i) && !r.name) {
+      const line = lines[i];
+      if (line.length > 3 && !/pin|state|mobile|order|ordee|\d{5}/i.test(line)) {
+        r.name = line; break;
+      }
     }
   }
 
@@ -465,19 +506,19 @@ function parseIndianAddress(text) {
 
 function populateForm(addr) {
   const map = {
-    'f-name':addr.name, 'f-street1':addr.street1, 'f-street2':addr.street2,
-    'f-city':addr.city, 'f-state':addr.state, 'f-zip':addr.zip, 'f-mobile':addr.mobile
+    'f-name':addr.name,'f-street1':addr.street1,'f-street2':addr.street2,
+    'f-city':addr.city,'f-state':addr.state,'f-zip':addr.zip,'f-mobile':addr.mobile
   };
   Object.entries(map).forEach(([id,val]) => {
     const el = document.getElementById(id);
     if (el && val) { el.value = val; el.classList.add('filled'); }
   });
   populated = true;
+  clearInterval(scanInterval);
   if (stream) stream.getTracks().forEach(t => t.stop());
   video.style.display = 'none';
   overlay.style.display = 'none';
   hint.style.display = 'none';
-  tapBtnWrap.style.display = 'none';
   setDot('done');
   setStatus('Address detected and filled in!', 'ok');
   document.getElementById('btn-save').disabled = false;
@@ -487,7 +528,8 @@ function populateForm(addr) {
 function rescan() {
   clearAll();
   document.getElementById('rescan-btn').style.display = 'none';
-  startScanner();
+  if (currentTab === 'camera') startScanner();
+  else setStatus('Choose an image to scan');
 }
 
 function clearAll() {
@@ -497,18 +539,20 @@ function clearAll() {
   });
   document.getElementById('btn-save').disabled = true;
   document.getElementById('success-banner').style.display = 'none';
-  document.getElementById('preview-wrap').style.display = 'none';
   rawTextEl.style.display = 'none';
   populated = false;
+  clearInterval(scanInterval);
   if (stream) stream.getTracks().forEach(t => t.stop());
   stream = null;
   video.style.display = 'none';
   overlay.style.display = 'none';
   hint.style.display = 'none';
-  tapBtnWrap.style.display = 'none';
   placeholder.style.display = 'flex';
+  uploadPreview.style.display = 'none';
+  btnScanUpload.style.display = 'none';
+  uploadedImageData = null;
   setDot(''); liveLabel.textContent = 'ready';
-  setStatus('Press "Start camera" to begin');
+  setStatus(currentTab==='camera' ? 'Press start to activate camera' : 'Choose an image of the label to scan');
 }
 
 function saveAddress() {
