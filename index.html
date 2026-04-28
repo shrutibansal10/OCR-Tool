@@ -21,13 +21,17 @@
   .cam-title { font-size: 13px; font-weight: 600; }
   .live-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; font-weight: 500; background: #f5f4f0; border-radius: 20px; padding: 4px 10px; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
-  .dot.live { background: #22c55e; animation: pulse 1.5s infinite; }
+  .dot.live     { background: #22c55e; animation: pulse 1.5s infinite; }
   .dot.scanning { background: #f59e0b; animation: pulse 0.7s infinite; }
-  .dot.done { background: #22c55e; }
+  .dot.done     { background: #22c55e; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .cam-body { background: #111; position: relative; min-height: 420px; display: flex; align-items: center; justify-content: center; }
-  #video { width: 100%; display: none; max-height: 520px; object-fit: cover; }
+  .cam-body {
+    background: #111; position: relative;
+    min-height: 420px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  #video { width: 100%; display: none; max-height: 520px; object-fit: cover; pointer-events: none; }
   #canvas { display: none; }
 
   .cam-placeholder { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 3rem 2rem; text-align: center; }
@@ -35,18 +39,47 @@
   .btn-start { padding: 10px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
   .btn-start:hover { background: #1e40af; }
 
+  /* Portrait scan overlay */
   .scan-overlay { position: absolute; inset: 0; display: none; pointer-events: none; }
   .scan-overlay svg { width: 100%; height: 100%; }
-  .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.65); pointer-events: none; }
+
+  /* Big tap-to-scan button at bottom of camera */
+  .tap-btn-wrap {
+    display: none; position: absolute; bottom: 16px; left: 0; right: 0;
+    justify-content: center; pointer-events: all;
+  }
+  .tap-btn {
+    background: rgba(255,255,255,0.92); border: none; border-radius: 50px;
+    padding: 11px 28px; font-size: 14px; font-weight: 700; color: #1d4ed8;
+    cursor: pointer; box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    display: flex; align-items: center; gap: 8px;
+    transition: transform 0.1s, background 0.15s;
+  }
+  .tap-btn:active { transform: scale(0.95); background: #e0e7ff; }
+  .tap-btn svg { width: 18px; height: 18px; }
+
+  /* Flash effect on capture */
+  .flash {
+    position: absolute; inset: 0; background: white;
+    opacity: 0; pointer-events: none; transition: opacity 0.05s;
+  }
+  .flash.go { opacity: 0.7; }
+
+  .hint { position: absolute; top: 12px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.7); pointer-events: none; }
 
   .status-bar { padding: 9px 16px; font-size: 12px; min-height: 36px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #f0ede6; color: #888; transition: background 0.2s, color 0.2s; }
-  .status-bar.ok  { color: #16a34a; background: #f0fdf4; }
-  .status-bar.err { color: #dc2626; background: #fef2f2; }
-  .status-bar.warn{ color: #92400e; background: #fffbeb; }
+  .status-bar.ok   { color: #16a34a; background: #f0fdf4; }
+  .status-bar.err  { color: #dc2626; background: #fef2f2; }
+  .status-bar.warn { color: #92400e; background: #fffbeb; }
   .spinner { width:13px; height:13px; border:1.5px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
-  .raw-text-wrap { display:none; margin:0 16px 12px; padding:8px 12px; background:#f8f8f6; border:1px solid #e8e6df; border-radius:8px; font-size:11px; color:#555; font-family:monospace; line-height:1.5; max-height:80px; overflow-y:auto; }
+  /* Preview of what OCR actually processed */
+  .preview-wrap { display:none; padding:8px 16px 4px; }
+  .preview-label { font-size:10px; color:#999; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
+  .preview-wrap img { width:100%; max-height:120px; object-fit:contain; border-radius:6px; border:1px solid #e2e0d8; background:#f8f8f6; }
+
+  .raw-text-wrap { display:none; margin:6px 16px 12px; padding:8px 12px; background:#f8f8f6; border:1px solid #e8e6df; border-radius:8px; font-size:11px; color:#555; font-family:monospace; line-height:1.5; max-height:80px; overflow-y:auto; }
 
   .section-label { font-size:11px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
   .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.25rem; }
@@ -72,11 +105,11 @@
 <body>
 <div class="app">
   <h1>Address Scanner</h1>
-  <p class="subtitle">100% free · No API key · Works offline</p>
+  <p class="subtitle">100% free · No API key · Tap to scan when label is in focus</p>
 
   <div class="cam-card">
     <div class="cam-header">
-      <span class="cam-title">Live camera</span>
+      <span class="cam-title">Camera</span>
       <div style="display:flex;align-items:center;gap:10px;">
         <button id="rescan-btn" onclick="rescan()">Scan again</button>
         <div class="live-pill">
@@ -86,15 +119,16 @@
       </div>
     </div>
 
-    <div class="cam-body">
+    <div class="cam-body" id="cam-body">
       <div class="cam-placeholder" id="placeholder">
-        <p>Place the label inside the frame — fills automatically, no button needed</p>
-        <button class="btn-start" onclick="startScanner()">Start scanner</button>
+        <p>Point camera at the label, wait for it to focus, then tap the Scan button</p>
+        <button class="btn-start" onclick="startScanner()">Start camera</button>
       </div>
+
       <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas"></canvas>
 
-      <!-- Portrait scan frame matching shipping label shape -->
+      <!-- Portrait frame — matches shipping label shape -->
       <div class="scan-overlay" id="overlay">
         <svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -103,21 +137,34 @@
               <rect x="60" y="40" width="280" height="520" rx="12" fill="black"/>
             </mask>
           </defs>
-          <rect width="400" height="600" fill="rgba(0,0,0,0.62)" mask="url(#cutout)"/>
+          <rect width="400" height="600" fill="rgba(0,0,0,0.55)" mask="url(#cutout)"/>
           <rect x="60" y="40" width="280" height="520" rx="12" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="1.5"/>
-          <polyline points="60,85 60,40 105,40"   fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <polyline points="295,40 340,40 340,85"  fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+          <polyline points="60,85 60,40 105,40"    fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+          <polyline points="295,40 340,40 340,85"   fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
           <polyline points="60,515 60,560 105,560"  fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
           <polyline points="295,560 340,560 340,515" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <line x1="62" y1="40" x2="338" y2="40" stroke="rgba(96,165,250,0.8)" stroke-width="2">
-            <animateTransform attributeName="transform" type="translate" from="0,0" to="0,520" dur="2.5s" repeatCount="indefinite"/>
-          </line>
         </svg>
       </div>
-      <div class="hint" id="hint" style="display:none">Fit the entire label inside the frame · hold very still</div>
+
+      <div class="hint" id="hint" style="display:none">Fit the full label inside the frame</div>
+      <div class="flash" id="flash"></div>
+
+      <!-- Tap to scan button -->
+      <div class="tap-btn-wrap" id="tap-btn-wrap">
+        <button class="tap-btn" onclick="doScan()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Scan label
+        </button>
+      </div>
     </div>
 
-    <div class="status-bar" id="status-bar"><span id="status-msg">Press start to activate camera</span></div>
+    <div class="status-bar" id="status-bar"><span id="status-msg">Press "Start camera" to begin</span></div>
+    <div class="preview-wrap" id="preview-wrap">
+      <div class="preview-label">What OCR processed</div>
+      <img id="preview-img" alt="processed">
+    </div>
     <div class="raw-text-wrap" id="raw-text"></div>
   </div>
 
@@ -145,97 +192,113 @@
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-let stream = null, scanInterval = null, isScanning = false, populated = false, worker = null;
+let stream = null, isScanning = false, populated = false, worker = null;
 
-const video      = document.getElementById('video');
-const canvas     = document.getElementById('canvas');
-const dot        = document.getElementById('dot');
-const liveLabel  = document.getElementById('live-label');
-const statusBar  = document.getElementById('status-bar');
-const statusMsg  = document.getElementById('status-msg');
-const overlay    = document.getElementById('overlay');
-const hint       = document.getElementById('hint');
-const placeholder= document.getElementById('placeholder');
-const rawTextEl  = document.getElementById('raw-text');
+const video       = document.getElementById('video');
+const canvas      = document.getElementById('canvas');
+const dot         = document.getElementById('dot');
+const liveLabel   = document.getElementById('live-label');
+const statusBar   = document.getElementById('status-bar');
+const statusMsg   = document.getElementById('status-msg');
+const overlay     = document.getElementById('overlay');
+const hint        = document.getElementById('hint');
+const placeholder = document.getElementById('placeholder');
+const rawTextEl   = document.getElementById('raw-text');
+const flash       = document.getElementById('flash');
+const tapBtnWrap  = document.getElementById('tap-btn-wrap');
 
 // Crop to portrait frame (SVG: x=15%, y=6.7%, w=70%, h=86.7%)
 const FRAME = { x:0.15, y:0.067, w:0.70, h:0.867 };
 
 function setStatus(msg, type) {
   statusBar.className = 'status-bar'+(type?' '+type:'');
-  statusMsg.innerHTML = type==='scanning' ? '<div class="spinner"></div> '+msg : msg;
+  statusMsg.innerHTML = type==='scanning'
+    ? '<div class="spinner"></div> '+msg : msg;
 }
 function setDot(state) {
   dot.className = 'dot'+(state?' '+state:'');
-  liveLabel.textContent = {live:'live',scanning:'reading...',done:'done'}[state]||'ready';
+  liveLabel.textContent = {live:'live', scanning:'reading...', done:'done'}[state]||'ready';
+}
+
+// ── SHARPNESS DETECTION ───────────────────────────────────────────
+// Measures image sharpness using Laplacian variance — low = blurry
+function measureSharpness(cvs) {
+  const ctx = cvs.getContext('2d');
+  const w = cvs.width, h = cvs.height;
+  // Sample center region only
+  const sx = Math.round(w*0.25), sy = Math.round(h*0.25);
+  const sw = Math.round(w*0.5),  sh = Math.round(h*0.5);
+  const id = ctx.getImageData(sx, sy, sw, sh);
+  const d = id.data;
+  // Convert to grayscale
+  const gray = [];
+  for (let i = 0; i < d.length; i+=4)
+    gray.push(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
+  // Laplacian
+  let sum = 0, count = 0;
+  for (let y = 1; y < sh-1; y++) {
+    for (let x = 1; x < sw-1; x++) {
+      const i = y*sw+x;
+      const lap = Math.abs(-gray[i-sw-1] - gray[i-sw] - gray[i-sw+1]
+                           - gray[i-1]   + 8*gray[i]   - gray[i+1]
+                           - gray[i+sw-1]- gray[i+sw]  - gray[i+sw+1]);
+      sum += lap; count++;
+    }
+  }
+  return count > 0 ? sum/count : 0;
 }
 
 // ── PREPROCESSING ─────────────────────────────────────────────────
-// Based on testing: 2x upscale + sharpen works best for printed labels
-function preprocessFrame(srcCanvas) {
-  const scale = 2;
-  const w = srcCanvas.width * scale;
-  const h = srcCanvas.height * scale;
+// If image is sharp: apply full preprocessing (grayscale + adaptive threshold)
+// If image is blurry: use raw image (preprocessing makes blurry worse)
+function preprocessFrame(srcCanvas, sharpness) {
   const out = document.createElement('canvas');
-  out.width = w; out.height = h;
+  const scale = 2;
+  out.width  = srcCanvas.width  * scale;
+  out.height = srcCanvas.height * scale;
   const ctx = out.getContext('2d');
-
-  // Upscale with smoothing
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(srcCanvas, 0, 0, w, h);
+  ctx.drawImage(srcCanvas, 0, 0, out.width, out.height);
 
-  // Sharpen via unsharp mask (convolution)
-  const id = ctx.getImageData(0, 0, w, h);
-  const d = id.data;
-
-  // Convert to grayscale first
-  for (let i = 0; i < d.length; i+=4) {
-    const g = Math.round(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
-    d[i] = d[i+1] = d[i+2] = g;
+  // Only binarize if image is sharp enough (sharpness > 8 is decent)
+  if (sharpness > 8) {
+    const id = ctx.getImageData(0, 0, out.width, out.height);
+    const d = id.data;
+    // Grayscale
+    for (let i = 0; i < d.length; i+=4) {
+      const g = Math.round(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
+      d[i] = d[i+1] = d[i+2] = g;
+    }
+    // Adaptive threshold
+    let sum = 0;
+    for (let i = 0; i < d.length; i+=4) sum += d[i];
+    const thresh = (sum / (d.length/4)) * 0.85;
+    for (let i = 0; i < d.length; i+=4) {
+      const v = d[i] < thresh ? 0 : 255;
+      d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255;
+    }
+    ctx.putImageData(id, 0, 0);
   }
-
-  // Compute mean brightness for adaptive threshold
-  let sum = 0;
-  for (let i = 0; i < d.length; i+=4) sum += d[i];
-  const mean = sum / (d.length/4);
-
-  // Adaptive binarize: anything below 85% of mean = black, else white
-  const thresh = mean * 0.85;
-  for (let i = 0; i < d.length; i+=4) {
-    const v = d[i] < thresh ? 0 : 255;
-    d[i] = d[i+1] = d[i+2] = v;
-    d[i+3] = 255;
-  }
-
-  ctx.putImageData(id, 0, 0);
   return out;
 }
 
-// ── DIGIT CORRECTION ──────────────────────────────────────────────
-// Tesseract confuses certain chars in phone numbers. Fix common ones.
+// ── DIGIT / OCR ERROR CORRECTION ─────────────────────────────────
 function fixPhoneNumber(str) {
   return str
-    .replace(/[oO]/g, '0')
-    .replace(/[iIlL|!]/g, '1')
-    .replace(/[zZ]/g, '2')
-    .replace(/[sS]/g, '5') // only in phone context
-    .replace(/[gqG]/g, '9')
-    .replace(/[bB]/g, '8')
-    .replace(/[dD]/g, '0')
-    .replace(/[^0-9]/g, ''); // strip anything non-digit
+    .replace(/[oO]/g,'0').replace(/[iIlL|!]/g,'1').replace(/[zZ]/g,'2')
+    .replace(/[gqG]/g,'9').replace(/[bB]/g,'8').replace(/[sS]/g,'5')
+    .replace(/[^0-9]/g,'');
 }
 
 async function initWorker() {
-  setStatus('Loading OCR engine (one-time)...', 'scanning');
+  setStatus('Loading OCR engine (one-time download)...', 'scanning');
   worker = await Tesseract.createWorker('eng', 1, {
     logger: m => {
-      if (m.status === 'recognizing text')
+      if (m.status==='recognizing text')
         setStatus('Reading... '+Math.round(m.progress*100)+'%', 'scanning');
     }
   });
-  // PSM 6 = uniform block of text — best for labels
-  // OEM 3 = best available engine
   await worker.setParameters({
     tessedit_pageseg_mode: '6',
     tessedit_ocr_engine_mode: '3',
@@ -246,23 +309,17 @@ async function initWorker() {
 async function startScanner() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },
-        width:  { ideal: 1920 },
-        height: { ideal: 1080 },
-        focusMode: 'continuous'
-      }
+      video: { facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
     });
     video.srcObject = stream;
     video.style.display = 'block';
     placeholder.style.display = 'none';
     overlay.style.display = 'block';
     hint.style.display = 'block';
+    tapBtnWrap.style.display = 'flex';
     setDot('live');
     await initWorker();
-    setStatus('Hold label steady inside the frame — scanning every 5s...');
-    scanInterval = setInterval(captureAndScan, 5000);
-    setTimeout(captureAndScan, 2500);
+    setStatus('Label in frame? Tap "Scan label" when it looks sharp and clear.');
   } catch(e) {
     setStatus('Camera access denied — allow camera and refresh.', 'err');
   }
@@ -271,36 +328,55 @@ async function startScanner() {
 function cropToFrame() {
   if (!video.videoWidth) return null;
   const vw = video.videoWidth, vh = video.videoHeight;
-  const cx = Math.round(FRAME.x * vw);
-  const cy = Math.round(FRAME.y * vh);
-  const cw = Math.round(FRAME.w * vw);
-  const ch = Math.round(FRAME.h * vh);
+  const cx = Math.round(FRAME.x*vw), cy = Math.round(FRAME.y*vh);
+  const cw = Math.round(FRAME.w*vw), ch = Math.round(FRAME.h*vh);
   canvas.width = cw; canvas.height = ch;
   canvas.getContext('2d').drawImage(video, cx, cy, cw, ch, 0, 0, cw, ch);
   return canvas;
 }
 
-async function captureAndScan() {
+async function doScan() {
   if (isScanning || populated) return;
+
+  // Flash effect
+  flash.classList.add('go');
+  setTimeout(() => flash.classList.remove('go'), 150);
+
   const cropped = cropToFrame();
   if (!cropped) return;
 
   isScanning = true;
+  tapBtnWrap.style.display = 'none';
   setDot('scanning');
-  setStatus('Processing image...', 'scanning');
 
-  const processed = preprocessFrame(cropped);
+  // Measure sharpness and decide preprocessing
+  const sharpness = measureSharpness(cropped);
+  const processed = preprocessFrame(cropped, sharpness);
+
+  // Show preview
+  document.getElementById('preview-wrap').style.display = 'block';
+  document.getElementById('preview-img').src = processed.toDataURL();
+
+  setStatus('Reading text...', 'scanning');
 
   try {
-    const { data: { text } } = await worker.recognize(processed);
+    const { data: { text, confidence } } = await worker.recognize(processed);
     const cleaned = text.trim();
 
     rawTextEl.style.display = 'block';
-    rawTextEl.textContent = '📄 Raw: ' + cleaned;
+    rawTextEl.textContent = `📄 Sharpness: ${sharpness.toFixed(1)} · Confidence: ${confidence.toFixed(0)}%\n${cleaned}`;
 
     if (!cleaned || cleaned.length < 8) {
       setDot('live');
-      setStatus('No text — bring label closer and hold very still', 'warn');
+      setStatus('No text found — bring label closer and tap again', 'warn');
+      tapBtnWrap.style.display = 'flex';
+      isScanning = false; return;
+    }
+
+    if (confidence < 40) {
+      setDot('live');
+      setStatus(`Low confidence (${confidence.toFixed(0)}%) — label may be blurry. Try again.`, 'warn');
+      tapBtnWrap.style.display = 'flex';
       isScanning = false; return;
     }
 
@@ -308,88 +384,81 @@ async function captureAndScan() {
     if (!parsed.name && !parsed.city && !parsed.zip) {
       setDot('live');
       setStatus('Text found but address unclear — try again', 'warn');
+      tapBtnWrap.style.display = 'flex';
     } else {
       populateForm(parsed);
     }
   } catch(e) {
     setDot('live');
-    setStatus('OCR error — retrying...', 'err');
+    setStatus('OCR error — try again', 'err');
+    tapBtnWrap.style.display = 'flex';
   }
   isScanning = false;
 }
 
-// ── ADDRESS PARSER — tuned for Indian labels ──────────────────────
+// ── ADDRESS PARSER tuned for Indian shipping labels ───────────────
 function parseIndianAddress(text) {
   const r = { name:'', street1:'', street2:'', city:'', state:'', zip:'', mobile:'' };
   const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
-
-  // Track which line indices are used so we don't double-assign
   const used = new Set();
 
   lines.forEach((line, i) => {
-
-    // ── PIN code: 6 digits
+    // PIN code — 6 digits
     const pin = line.match(/\b(\d{6})\b/);
-    if (pin && !r.zip) { r.zip = pin[1]; }
+    if (pin && !r.zip) { r.zip = pin[1]; used.add(i); }
 
-    // ── Mobile: look for 10+ digit sequence, then fix OCR errors
-    const mobRaw = line.match(/(?:mobile|number|mob|ph)[^0-9]*([a-zA-Z0-9]{10,})/i);
+    // Mobile — fix common OCR digit errors
+    const mobRaw = line.match(/(?:mobile|number|mob|ph)[^0-9a-z]*([a-zA-Z0-9]{8,})/i);
     if (mobRaw && !r.mobile) {
       const fixed = fixPhoneNumber(mobRaw[1]);
-      if (fixed.length >= 10) r.mobile = fixed.slice(-10);
-      used.add(i);
+      if (fixed.length >= 10) { r.mobile = fixed.slice(-10); used.add(i); }
     }
-    // Also catch standalone number lines (next line after "Mobile number -")
-    if (!r.mobile && /^[a-zA-Z0-9]{10,13}$/.test(line.replace(/\s/g,''))) {
+    // Standalone number line (line after "Mobile number -")
+    if (!r.mobile && /^[a-zA-Z0-9]{8,13}$/.test(line.replace(/\s/g,''))) {
       const fixed = fixPhoneNumber(line.replace(/\s/g,''));
       if (fixed.length >= 10) { r.mobile = fixed.slice(-10); used.add(i); }
     }
 
-    // ── State
+    // State
     const stMatch = line.match(/^state[^a-z]*([a-z\s]+)/i);
     if (stMatch && !r.state) { r.state = stMatch[1].trim(); used.add(i); }
 
-    // ── House / flat number
+    // House/flat
     if (/house|flat|plot|door|h\.?no|villa|block/i.test(line) && !r.street1) {
-      r.street1 = line.replace(/house\s*no\s*[-:]/i,'House No.').trim();
-      used.add(i);
+      r.street1 = line.replace(/house\s*no\s*[-:]/i,'House No.').trim(); used.add(i);
     }
 
-    // ── Area / locality (contains locality keywords)
+    // Area/locality
     if (/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|phase|devipura|vijay)/i.test(line) && !r.street2) {
       r.street2 = line.trim(); used.add(i);
     }
 
-    // ── City from PIN line
+    // City from PIN line
     if (pin && !r.city) {
       const guess = line.replace(pin[0],'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
       if (guess.length > 2) { r.city = guess; used.add(i); }
     }
   });
 
-  // ── City fallback: standalone city line (often repeated in Indian labels)
+  // City fallback — standalone short proper-noun line
   if (!r.city) {
     lines.forEach((line, i) => {
-      if (!used.has(i) && !r.city &&
-          line.length > 3 && line.length < 25 &&
-          /^[A-Z]/.test(line) &&
-          !/order|ordee|pin|mobile|state|\d/i.test(line)) {
+      if (!used.has(i) && !r.city && line.length > 3 && line.length < 25
+          && /^[A-Z]/.test(line)
+          && !/order|ordee|pin|mobile|state|\d/i.test(line)) {
         r.city = line.trim(); used.add(i);
       }
     });
   }
 
-  // ── Name: first unused line that looks like a person/company name
+  // Name — first unused meaningful line
   for (let i = 0; i < lines.length; i++) {
-    if (!used.has(i) && !r.name) {
-      const line = lines[i];
-      if (line.length > 3 && !/pin|state|mobile|order|ordee|\d{4}/i.test(line)) {
-        r.name = line; break;
-      }
+    if (!used.has(i) && !r.name && lines[i].length > 3
+        && !/pin|state|mobile|order|ordee|\d{4}/i.test(lines[i])) {
+      r.name = lines[i]; break;
     }
   }
 
-  // Clean up
   Object.keys(r).forEach(k => { r[k] = r[k].replace(/\s+/g,' ').trim(); });
   return r;
 }
@@ -404,11 +473,11 @@ function populateForm(addr) {
     if (el && val) { el.value = val; el.classList.add('filled'); }
   });
   populated = true;
-  clearInterval(scanInterval);
   if (stream) stream.getTracks().forEach(t => t.stop());
   video.style.display = 'none';
   overlay.style.display = 'none';
   hint.style.display = 'none';
+  tapBtnWrap.style.display = 'none';
   setDot('done');
   setStatus('Address detected and filled in!', 'ok');
   document.getElementById('btn-save').disabled = false;
@@ -428,17 +497,18 @@ function clearAll() {
   });
   document.getElementById('btn-save').disabled = true;
   document.getElementById('success-banner').style.display = 'none';
+  document.getElementById('preview-wrap').style.display = 'none';
   rawTextEl.style.display = 'none';
   populated = false;
-  clearInterval(scanInterval);
   if (stream) stream.getTracks().forEach(t => t.stop());
   stream = null;
   video.style.display = 'none';
   overlay.style.display = 'none';
   hint.style.display = 'none';
+  tapBtnWrap.style.display = 'none';
   placeholder.style.display = 'flex';
   setDot(''); liveLabel.textContent = 'ready';
-  setStatus('Press start to activate camera');
+  setStatus('Press "Start camera" to begin');
 }
 
 function saveAddress() {
