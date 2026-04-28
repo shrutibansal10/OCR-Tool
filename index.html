@@ -12,11 +12,11 @@
     display: flex; align-items: flex-start; justify-content: center;
     padding: 1.5rem 1rem; color: #1a1a1a;
   }
-  .app { width: 100%; max-width: 560px; }
+  .app { width: 100%; max-width: 520px; }
   h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
-  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.25rem; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1rem; }
 
-  .cam-card { background: #fff; border-radius: 14px; border: 1px solid #e2e0d8; overflow: hidden; margin-bottom: 1.25rem; }
+  .cam-card { background: #fff; border-radius: 14px; border: 1px solid #e2e0d8; overflow: hidden; margin-bottom: 1rem; }
   .cam-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid #f0ede6; }
   .cam-title { font-size: 13px; font-weight: 600; }
   .live-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; font-weight: 500; background: #f5f4f0; border-radius: 20px; padding: 4px 10px; }
@@ -28,41 +28,33 @@
 
   .cam-body { background: #111; position: relative; min-height: 420px; display: flex; align-items: center; justify-content: center; }
   #video { width: 100%; display: none; max-height: 520px; object-fit: cover; }
-  #canvas, #proc-canvas { display: none; }
+  #canvas { display: none; }
 
-  .cam-placeholder { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 2.5rem 2rem; text-align: center; }
-  .cam-placeholder p { font-size: 13px; color: #aaa; max-width: 280px; line-height: 1.55; }
+  .cam-placeholder { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 3rem 2rem; text-align: center; }
+  .cam-placeholder p { font-size: 13px; color: #aaa; max-width: 260px; line-height: 1.55; }
   .btn-start { padding: 10px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
   .btn-start:hover { background: #1e40af; }
 
-  /* Scan overlay — darkens everything OUTSIDE the frame */
   .scan-overlay { position: absolute; inset: 0; display: none; pointer-events: none; }
   .scan-overlay svg { width: 100%; height: 100%; }
-
   .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.65); pointer-events: none; }
 
   .status-bar { padding: 9px 16px; font-size: 12px; min-height: 36px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #f0ede6; color: #888; transition: background 0.2s, color 0.2s; }
-  .status-bar.ok { color: #16a34a; background: #f0fdf4; }
+  .status-bar.ok  { color: #16a34a; background: #f0fdf4; }
   .status-bar.err { color: #dc2626; background: #fef2f2; }
-  .status-bar.warn { color: #92400e; background: #fffbeb; }
+  .status-bar.warn{ color: #92400e; background: #fffbeb; }
   .spinner { width:13px; height:13px; border:1.5px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
-  .preview-wrap { display:none; padding: 8px 16px 12px; }
-  .preview-row { display: flex; gap: 8px; }
-  .preview-box { flex:1; text-align:center; }
-  .preview-box p { font-size:10px; color:#999; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.04em; }
-  .preview-box img { width:100%; height:80px; object-fit:contain; border-radius:6px; border:1px solid #e2e0d8; background:#f8f8f6; }
+  .raw-text-wrap { display:none; margin:0 16px 12px; padding:8px 12px; background:#f8f8f6; border:1px solid #e8e6df; border-radius:8px; font-size:11px; color:#555; font-family:monospace; line-height:1.5; max-height:80px; overflow-y:auto; }
 
-  .raw-text-wrap { display: none; margin: 0 16px 12px; padding: 8px 12px; background: #f8f8f6; border: 1px solid #e8e6df; border-radius: 8px; font-size: 11px; color: #555; font-family: monospace; line-height: 1.5; max-height: 80px; overflow-y: auto; }
-
-  .section-label { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
-  .full { grid-column: 1 / -1; }
+  .section-label { font-size:11px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.25rem; }
+  .full { grid-column:1/-1; }
   .field { display:flex; flex-direction:column; gap:5px; }
   .field label { font-size:11px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.05em; }
-  .field input { height:38px; padding:0 12px; border:1px solid #e2e0d8; border-radius:8px; font-size:14px; color:#1a1a1a; background:#fff; transition: border-color 0.2s, box-shadow 0.2s; }
-  .field input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
+  .field input { height:38px; padding:0 12px; border:1px solid #e2e0d8; border-radius:8px; font-size:14px; color:#1a1a1a; background:#fff; transition:border-color .2s,box-shadow .2s; }
+  .field input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.12); }
   .field input.filled { border-color:#22c55e; background:#f0fdf4; }
 
   .actions { display:flex; gap:10px; }
@@ -70,14 +62,17 @@
   .btn-clear:hover { background:#f5f4f0; }
   .btn-save { flex:1; padding:10px 24px; background:#1d4ed8; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
   .btn-save:hover:not(:disabled) { background:#1e40af; }
-  .btn-save:disabled { opacity:0.35; cursor:not-allowed; }
+  .btn-save:disabled { opacity:.35; cursor:not-allowed; }
   #rescan-btn { display:none; background:none; border:none; color:#1d4ed8; font-size:12px; cursor:pointer; text-decoration:underline; }
+
+  .success-banner { display:none; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 18px; margin-top:1rem; font-size:13px; color:#166534; line-height:1.6; }
+  .success-banner strong { display:block; font-size:14px; margin-bottom:4px; }
 </style>
 </head>
 <body>
 <div class="app">
   <h1>Address Scanner</h1>
-  <p class="subtitle">Works offline · No API key needed</p>
+  <p class="subtitle">100% free · No API key · Works offline</p>
 
   <div class="cam-card">
     <div class="cam-header">
@@ -91,45 +86,38 @@
       </div>
     </div>
 
-    <div class="cam-body" id="cam-body">
+    <div class="cam-body">
       <div class="cam-placeholder" id="placeholder">
-        <p>Place the address label inside the frame — it scans automatically</p>
+        <p>Place the label inside the frame — fills automatically, no button needed</p>
         <button class="btn-start" onclick="startScanner()">Start scanner</button>
       </div>
       <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas"></canvas>
-      <canvas id="proc-canvas"></canvas>
 
-      <!-- SVG overlay: dims area outside the scan box -->
+      <!-- Portrait scan frame matching shipping label shape -->
       <div class="scan-overlay" id="overlay">
-        <svg id="overlay-svg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <mask id="cutout">
               <rect width="400" height="600" fill="white"/>
-              <rect x="80" y="30" width="240" height="540" rx="10" fill="black"/>
+              <rect x="60" y="40" width="280" height="520" rx="12" fill="black"/>
             </mask>
           </defs>
-          <rect width="400" height="600" fill="rgba(0,0,0,0.6)" mask="url(#cutout)"/>
-          <rect x="80" y="30" width="240" height="540" rx="10" fill="none" stroke="rgba(96,165,250,0.85)" stroke-width="1.5"/>
-          <polyline points="80,70 80,30 120,30" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <polyline points="280,30 320,30 320,70" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <polyline points="80,530 80,570 120,570" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <polyline points="280,570 320,570 320,530" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
-          <line x1="82" y1="30" x2="318" y2="30" stroke="rgba(96,165,250,0.75)" stroke-width="2">
-            <animateTransform attributeName="transform" type="translate" from="0,0" to="0,540" dur="2.5s" repeatCount="indefinite"/>
+          <rect width="400" height="600" fill="rgba(0,0,0,0.62)" mask="url(#cutout)"/>
+          <rect x="60" y="40" width="280" height="520" rx="12" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="1.5"/>
+          <polyline points="60,85 60,40 105,40"   fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+          <polyline points="295,40 340,40 340,85"  fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+          <polyline points="60,515 60,560 105,560"  fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+          <polyline points="295,560 340,560 340,515" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+          <line x1="62" y1="40" x2="338" y2="40" stroke="rgba(96,165,250,0.8)" stroke-width="2">
+            <animateTransform attributeName="transform" type="translate" from="0,0" to="0,520" dur="2.5s" repeatCount="indefinite"/>
           </line>
         </svg>
       </div>
-      <div class="hint" id="hint" style="display:none">Fill the label inside the blue frame · hold still</div>
+      <div class="hint" id="hint" style="display:none">Fit the entire label inside the frame · hold very still</div>
     </div>
 
     <div class="status-bar" id="status-bar"><span id="status-msg">Press start to activate camera</span></div>
-    <div class="preview-wrap" id="preview-wrap">
-      <div class="preview-row">
-        <div class="preview-box"><p>Cropped</p><img id="prev-crop" alt="cropped"></div>
-        <div class="preview-box"><p>Processed (what OCR sees)</p><img id="prev-proc" alt="processed"></div>
-      </div>
-    </div>
     <div class="raw-text-wrap" id="raw-text"></div>
   </div>
 
@@ -148,26 +136,30 @@
     <button class="btn-clear" onclick="clearAll()">Clear</button>
     <button class="btn-save" id="btn-save" disabled onclick="saveAddress()">Save address</button>
   </div>
+
+  <div class="success-banner" id="success-banner">
+    <strong>Address saved!</strong>
+    <span id="saved-text"></span>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 let stream = null, scanInterval = null, isScanning = false, populated = false, worker = null;
 
-const video    = document.getElementById('video');
-const canvas   = document.getElementById('canvas');
-const procCvs  = document.getElementById('proc-canvas');
-const dot      = document.getElementById('dot');
-const liveLabel= document.getElementById('live-label');
-const statusBar= document.getElementById('status-bar');
-const statusMsg= document.getElementById('status-msg');
-const overlay  = document.getElementById('overlay');
-const hint     = document.getElementById('hint');
-const placeholder = document.getElementById('placeholder');
-const rawTextEl= document.getElementById('raw-text');
+const video      = document.getElementById('video');
+const canvas     = document.getElementById('canvas');
+const dot        = document.getElementById('dot');
+const liveLabel  = document.getElementById('live-label');
+const statusBar  = document.getElementById('status-bar');
+const statusMsg  = document.getElementById('status-msg');
+const overlay    = document.getElementById('overlay');
+const hint       = document.getElementById('hint');
+const placeholder= document.getElementById('placeholder');
+const rawTextEl  = document.getElementById('raw-text');
 
-// Scan frame dimensions as fractions of video size — portrait shape to match shipping labels
-const FRAME = { x: 0.20, y: 0.05, w: 0.60, h: 0.90 };
+// Crop to portrait frame (SVG: x=15%, y=6.7%, w=70%, h=86.7%)
+const FRAME = { x:0.15, y:0.067, w:0.70, h:0.867 };
 
 function setStatus(msg, type) {
   statusBar.className = 'status-bar'+(type?' '+type:'');
@@ -178,69 +170,75 @@ function setDot(state) {
   liveLabel.textContent = {live:'live',scanning:'reading...',done:'done'}[state]||'ready';
 }
 
-// ── CROP to scan frame only ───────────────────────────────────────
-function cropFrame() {
-  if (!video.videoWidth) return null;
-  const vw = video.videoWidth, vh = video.videoHeight;
-  const cx = Math.round(FRAME.x * vw);
-  const cy = Math.round(FRAME.y * vh);
-  const cw = Math.round(FRAME.w * vw);
-  const ch = Math.round(FRAME.h * vh);
+// ── PREPROCESSING ─────────────────────────────────────────────────
+// Based on testing: 2x upscale + sharpen works best for printed labels
+function preprocessFrame(srcCanvas) {
+  const scale = 2;
+  const w = srcCanvas.width * scale;
+  const h = srcCanvas.height * scale;
+  const out = document.createElement('canvas');
+  out.width = w; out.height = h;
+  const ctx = out.getContext('2d');
 
-  canvas.width = cw;
-  canvas.height = ch;
-  canvas.getContext('2d').drawImage(video, cx, cy, cw, ch, 0, 0, cw, ch);
-  return canvas;
-}
-
-// ── IMAGE PREPROCESSING ──────────────────────────────────────────
-function preprocess(src) {
-  const scale = 3; // 3x upscale
-  const w = src.width * scale;
-  const h = src.height * scale;
-  procCvs.width = w;
-  procCvs.height = h;
-  const ctx = procCvs.getContext('2d');
+  // Upscale with smoothing
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(src, 0, 0, w, h);
+  ctx.drawImage(srcCanvas, 0, 0, w, h);
 
+  // Sharpen via unsharp mask (convolution)
   const id = ctx.getImageData(0, 0, w, h);
-  const d  = id.data;
+  const d = id.data;
 
-  // 1. Grayscale
-  for (let i = 0; i < d.length; i += 4) {
-    const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+  // Convert to grayscale first
+  for (let i = 0; i < d.length; i+=4) {
+    const g = Math.round(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
     d[i] = d[i+1] = d[i+2] = g;
   }
 
-  // 2. Compute mean brightness for adaptive threshold
+  // Compute mean brightness for adaptive threshold
   let sum = 0;
-  for (let i = 0; i < d.length; i += 4) sum += d[i];
-  const mean = sum / (d.length / 4);
-  const thresh = mean * 0.85; // slightly below mean → catches dark text on light bg
+  for (let i = 0; i < d.length; i+=4) sum += d[i];
+  const mean = sum / (d.length/4);
 
-  // 3. Binarize
-  for (let i = 0; i < d.length; i += 4) {
-    const val = d[i] < thresh ? 0 : 255;
-    d[i] = d[i+1] = d[i+2] = val;
+  // Adaptive binarize: anything below 85% of mean = black, else white
+  const thresh = mean * 0.85;
+  for (let i = 0; i < d.length; i+=4) {
+    const v = d[i] < thresh ? 0 : 255;
+    d[i] = d[i+1] = d[i+2] = v;
     d[i+3] = 255;
   }
 
   ctx.putImageData(id, 0, 0);
-  return procCvs;
+  return out;
+}
+
+// ── DIGIT CORRECTION ──────────────────────────────────────────────
+// Tesseract confuses certain chars in phone numbers. Fix common ones.
+function fixPhoneNumber(str) {
+  return str
+    .replace(/[oO]/g, '0')
+    .replace(/[iIlL|!]/g, '1')
+    .replace(/[zZ]/g, '2')
+    .replace(/[sS]/g, '5') // only in phone context
+    .replace(/[gqG]/g, '9')
+    .replace(/[bB]/g, '8')
+    .replace(/[dD]/g, '0')
+    .replace(/[^0-9]/g, ''); // strip anything non-digit
 }
 
 async function initWorker() {
-  setStatus('Loading OCR engine (one-time download)...', 'scanning');
+  setStatus('Loading OCR engine (one-time)...', 'scanning');
   worker = await Tesseract.createWorker('eng', 1, {
     logger: m => {
       if (m.status === 'recognizing text')
         setStatus('Reading... '+Math.round(m.progress*100)+'%', 'scanning');
     }
   });
+  // PSM 6 = uniform block of text — best for labels
+  // OEM 3 = best available engine
   await worker.setParameters({
-    tessedit_pageseg_mode: '6',   // uniform block of text
+    tessedit_pageseg_mode: '6',
+    tessedit_ocr_engine_mode: '3',
     preserve_interword_spaces: '1',
   });
 }
@@ -248,7 +246,12 @@ async function initWorker() {
 async function startScanner() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: {ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
+      video: {
+        facingMode: { ideal: 'environment' },
+        width:  { ideal: 1920 },
+        height: { ideal: 1080 },
+        focusMode: 'continuous'
+      }
     });
     video.srcObject = stream;
     video.style.display = 'block';
@@ -257,7 +260,7 @@ async function startScanner() {
     hint.style.display = 'block';
     setDot('live');
     await initWorker();
-    setStatus('Hold the label steady inside the blue frame...');
+    setStatus('Hold label steady inside the frame — scanning every 5s...');
     scanInterval = setInterval(captureAndScan, 5000);
     setTimeout(captureAndScan, 2500);
   } catch(e) {
@@ -265,36 +268,44 @@ async function startScanner() {
   }
 }
 
+function cropToFrame() {
+  if (!video.videoWidth) return null;
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const cx = Math.round(FRAME.x * vw);
+  const cy = Math.round(FRAME.y * vh);
+  const cw = Math.round(FRAME.w * vw);
+  const ch = Math.round(FRAME.h * vh);
+  canvas.width = cw; canvas.height = ch;
+  canvas.getContext('2d').drawImage(video, cx, cy, cw, ch, 0, 0, cw, ch);
+  return canvas;
+}
+
 async function captureAndScan() {
   if (isScanning || populated) return;
-  const cropped = cropFrame();
+  const cropped = cropToFrame();
   if (!cropped) return;
 
   isScanning = true;
   setDot('scanning');
   setStatus('Processing image...', 'scanning');
 
-  // Show previews
-  document.getElementById('prev-crop').src = cropped.toDataURL();
-  const processed = preprocess(cropped);
-  document.getElementById('prev-proc').src = processed.toDataURL();
-  document.getElementById('preview-wrap').style.display = 'block';
+  const processed = preprocessFrame(cropped);
 
   try {
     const { data: { text } } = await worker.recognize(processed);
     const cleaned = text.trim();
 
     rawTextEl.style.display = 'block';
-    rawTextEl.textContent = '📄 Raw OCR: ' + cleaned;
+    rawTextEl.textContent = '📄 Raw: ' + cleaned;
 
     if (!cleaned || cleaned.length < 8) {
       setDot('live');
-      setStatus('No text found — bring label closer and hold still', 'warn');
+      setStatus('No text — bring label closer and hold very still', 'warn');
       isScanning = false; return;
     }
 
     const parsed = parseIndianAddress(cleaned);
-    if (!parsed.street1 && !parsed.city && !parsed.zip) {
+    if (!parsed.name && !parsed.city && !parsed.zip) {
       setDot('live');
       setStatus('Text found but address unclear — try again', 'warn');
     } else {
@@ -307,72 +318,87 @@ async function captureAndScan() {
   isScanning = false;
 }
 
-// ── ADDRESS PARSER tuned for Indian shipping labels ───────────────
+// ── ADDRESS PARSER — tuned for Indian labels ──────────────────────
 function parseIndianAddress(text) {
   const r = { name:'', street1:'', street2:'', city:'', state:'', zip:'', mobile:'' };
   const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
 
-  lines.forEach(line => {
-    const lo = line.toLowerCase();
+  // Track which line indices are used so we don't double-assign
+  const used = new Set();
 
-    // PIN code — 6 digits
+  lines.forEach((line, i) => {
+
+    // ── PIN code: 6 digits
     const pin = line.match(/\b(\d{6})\b/);
-    if (pin && !r.zip) r.zip = pin[1];
+    if (pin && !r.zip) { r.zip = pin[1]; }
 
-    // Mobile — 10 digits starting 6-9, with optional country code
-    const mob = line.match(/(?:mobile[^0-9]*|number[^0-9]*|\+?91[-\s]?)?([6-9]\d{9})/i);
-    if (mob && !r.mobile) r.mobile = mob[1];
+    // ── Mobile: look for 10+ digit sequence, then fix OCR errors
+    const mobRaw = line.match(/(?:mobile|number|mob|ph)[^0-9]*([a-zA-Z0-9]{10,})/i);
+    if (mobRaw && !r.mobile) {
+      const fixed = fixPhoneNumber(mobRaw[1]);
+      if (fixed.length >= 10) r.mobile = fixed.slice(-10);
+      used.add(i);
+    }
+    // Also catch standalone number lines (next line after "Mobile number -")
+    if (!r.mobile && /^[a-zA-Z0-9]{10,13}$/.test(line.replace(/\s/g,''))) {
+      const fixed = fixPhoneNumber(line.replace(/\s/g,''));
+      if (fixed.length >= 10) { r.mobile = fixed.slice(-10); used.add(i); }
+    }
 
-    // State — "State up" / "State: Maharashtra"
-    const stMatch = line.match(/state[^a-z]*([a-z\s]+)/i);
-    if (stMatch && !r.state) r.state = stMatch[1].trim();
+    // ── State
+    const stMatch = line.match(/^state[^a-z]*([a-z\s]+)/i);
+    if (stMatch && !r.state) { r.state = stMatch[1].trim(); used.add(i); }
 
-    // House / flat
-    if (/house|flat|plot|door|h\.?no|villa|block/i.test(lo) && !r.street1)
+    // ── House / flat number
+    if (/house|flat|plot|door|h\.?no|villa|block/i.test(line) && !r.street1) {
       r.street1 = line.replace(/house\s*no\s*[-:]/i,'House No.').trim();
+      used.add(i);
+    }
 
-    // Area / locality
-    if (/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|phase|devipura|vijay)/i.test(lo) && !r.street2)
-      r.street2 = line.trim();
+    // ── Area / locality (contains locality keywords)
+    if (/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|phase|devipura|vijay)/i.test(line) && !r.street2) {
+      r.street2 = line.trim(); used.add(i);
+    }
 
-    // City — repeated standalone city name (common in Indian labels)
+    // ── City from PIN line
     if (pin && !r.city) {
       const guess = line.replace(pin[0],'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
-      if (guess.length > 2) r.city = guess;
+      if (guess.length > 2) { r.city = guess; used.add(i); }
     }
   });
 
-  // City fallback — look for line that has the PIN city
-  if (!r.city && r.zip) {
-    lines.forEach(line => {
-      if (line.includes(r.zip)) {
-        const c = line.replace(r.zip,'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
-        if (c.length > 2 && !r.city) r.city = c;
+  // ── City fallback: standalone city line (often repeated in Indian labels)
+  if (!r.city) {
+    lines.forEach((line, i) => {
+      if (!used.has(i) && !r.city &&
+          line.length > 3 && line.length < 25 &&
+          /^[A-Z]/.test(line) &&
+          !/order|ordee|pin|mobile|state|\d/i.test(line)) {
+        r.city = line.trim(); used.add(i);
       }
     });
   }
 
-  // City second fallback — standalone city line (e.g. "Bulandshahr" repeated)
-  if (!r.city && r.street2) {
-    lines.forEach(line => {
-      if (line.toLowerCase().includes(r.street2.toLowerCase().split(' ').pop()) && line !== r.street2 && !r.city)
-        r.city = line.trim();
-    });
-  }
-
-  // Name — first meaningful line that doesn't match address keywords
-  for (const line of lines) {
-    if (!/house|flat|plot|pin|state|mobile|order|ordee|no\.|nagar|colony|\d{6}|\d{10}|devipura/i.test(line) && line.length > 3) {
-      r.name = line; break;
+  // ── Name: first unused line that looks like a person/company name
+  for (let i = 0; i < lines.length; i++) {
+    if (!used.has(i) && !r.name) {
+      const line = lines[i];
+      if (line.length > 3 && !/pin|state|mobile|order|ordee|\d{4}/i.test(line)) {
+        r.name = line; break;
+      }
     }
   }
 
+  // Clean up
   Object.keys(r).forEach(k => { r[k] = r[k].replace(/\s+/g,' ').trim(); });
   return r;
 }
 
 function populateForm(addr) {
-  const map = { 'f-name':addr.name,'f-street1':addr.street1,'f-street2':addr.street2,'f-city':addr.city,'f-state':addr.state,'f-zip':addr.zip,'f-mobile':addr.mobile };
+  const map = {
+    'f-name':addr.name, 'f-street1':addr.street1, 'f-street2':addr.street2,
+    'f-city':addr.city, 'f-state':addr.state, 'f-zip':addr.zip, 'f-mobile':addr.mobile
+  };
   Object.entries(map).forEach(([id,val]) => {
     const el = document.getElementById(id);
     if (el && val) { el.value = val; el.classList.add('filled'); }
@@ -401,8 +427,8 @@ function clearAll() {
     el.value = ''; el.classList.remove('filled');
   });
   document.getElementById('btn-save').disabled = true;
+  document.getElementById('success-banner').style.display = 'none';
   rawTextEl.style.display = 'none';
-  document.getElementById('preview-wrap').style.display = 'none';
   populated = false;
   clearInterval(scanInterval);
   if (stream) stream.getTracks().forEach(t => t.stop());
@@ -416,9 +442,10 @@ function clearAll() {
 }
 
 function saveAddress() {
-  const lines = ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile']
-    .map(id => document.getElementById(id).value).filter(Boolean).join('\n');
-  alert('Saved:\n\n' + lines);
+  const vals = ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile']
+    .map(id => document.getElementById(id).value).filter(Boolean).join(', ');
+  document.getElementById('saved-text').textContent = vals;
+  document.getElementById('success-banner').style.display = 'block';
 }
 </script>
 </body>
