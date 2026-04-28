@@ -6,182 +6,85 @@
 <title>Address Scanner</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #f5f4f0;
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 2rem 1rem;
-    color: #1a1a1a;
+    background: #f5f4f0; min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 1.5rem 1rem; color: #1a1a1a;
   }
-
   .app { width: 100%; max-width: 560px; }
-
   h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
   .subtitle { font-size: 13px; color: #888; margin-bottom: 1.25rem; }
 
-  .cam-card {
-    background: #fff;
-    border-radius: 14px;
-    border: 1px solid #e2e0d8;
-    overflow: hidden;
-    margin-bottom: 1.25rem;
-  }
-
-  .cam-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 11px 16px;
-    border-bottom: 1px solid #f0ede6;
-  }
+  .cam-card { background: #fff; border-radius: 14px; border: 1px solid #e2e0d8; overflow: hidden; margin-bottom: 1.25rem; }
+  .cam-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid #f0ede6; }
   .cam-title { font-size: 13px; font-weight: 600; }
-  .live-pill {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: #888; font-weight: 500;
-    background: #f5f4f0; border-radius: 20px; padding: 4px 10px;
-  }
+  .live-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; font-weight: 500; background: #f5f4f0; border-radius: 20px; padding: 4px 10px; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
   .dot.live { background: #22c55e; animation: pulse 1.5s infinite; }
   .dot.scanning { background: #f59e0b; animation: pulse 0.7s infinite; }
   .dot.done { background: #22c55e; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .cam-body {
-    background: #111;
-    position: relative;
-    min-height: 220px;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .cam-body { background: #111; position: relative; min-height: 220px; display: flex; align-items: center; justify-content: center; }
+  #video { width: 100%; display: none; max-height: 300px; object-fit: cover; }
+  #canvas, #proc-canvas { display: none; }
 
-  #video { width: 100%; display: none; max-height: 280px; object-fit: cover; }
-  #canvas { display: none; }
-
-  .cam-placeholder {
-    display: flex; flex-direction: column; align-items: center; gap: 14px;
-    padding: 2.5rem 2rem; text-align: center;
-  }
+  .cam-placeholder { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 2.5rem 2rem; text-align: center; }
   .cam-placeholder p { font-size: 13px; color: #aaa; max-width: 280px; line-height: 1.55; }
 
-  .btn-start {
-    padding: 10px 26px; background: #1d4ed8; color: #fff;
-    border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: background 0.15s;
-  }
+  .btn-start { padding: 10px 26px; background: #1d4ed8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
   .btn-start:hover { background: #1e40af; }
 
-  .scan-overlay {
-    position: absolute; inset: 0;
-    display: none; align-items: center; justify-content: center;
-    pointer-events: none;
-  }
-  .scan-frame {
-    width: 82%; max-width: 380px; height: 90px;
-    border: 1.5px solid rgba(99,179,237,0.65);
-    border-radius: 6px; position: relative; overflow: hidden;
-  }
+  .scan-overlay { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; pointer-events: none; }
+  .scan-frame { width: 85%; max-width: 400px; height: 110px; border: 1.5px solid rgba(99,179,237,0.65); border-radius: 6px; position: relative; overflow: hidden; }
   .sf-c { position: absolute; width: 16px; height: 16px; }
   .sf-c.tl { top:-2px;left:-2px; border-top:2.5px solid #60a5fa; border-left:2.5px solid #60a5fa; border-radius:3px 0 0 0; }
   .sf-c.tr { top:-2px;right:-2px; border-top:2.5px solid #60a5fa; border-right:2.5px solid #60a5fa; border-radius:0 3px 0 0; }
   .sf-c.bl { bottom:-2px;left:-2px; border-bottom:2.5px solid #60a5fa; border-left:2.5px solid #60a5fa; border-radius:0 0 0 3px; }
   .sf-c.br { bottom:-2px;right:-2px; border-bottom:2.5px solid #60a5fa; border-right:2.5px solid #60a5fa; border-radius:0 0 3px 0; }
-  .scan-line {
-    position: absolute; left:0; right:0; height:2px;
-    background: rgba(96,165,250,0.75);
-    animation: scanmove 2s ease-in-out infinite;
-  }
+  .scan-line { position: absolute; left:0; right:0; height:2px; background: rgba(96,165,250,0.75); animation: scanmove 2s ease-in-out infinite; }
   @keyframes scanmove { 0%{top:0} 100%{top:100%} }
+  .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,0.6); pointer-events: none; }
 
-  .hint {
-    position: absolute; bottom: 10px; left: 0; right: 0;
-    text-align: center; font-size: 11px; color: rgba(255,255,255,0.6);
-    pointer-events: none;
-  }
-
-  .status-bar {
-    padding: 9px 16px; font-size: 12px; min-height: 36px;
-    display: flex; align-items: center; gap: 8px;
-    border-top: 1px solid #f0ede6; color: #888; background: #fff;
-    transition: background 0.2s, color 0.2s;
-  }
+  .status-bar { padding: 9px 16px; font-size: 12px; min-height: 36px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #f0ede6; color: #888; transition: background 0.2s, color 0.2s; }
   .status-bar.ok { color: #16a34a; background: #f0fdf4; }
   .status-bar.err { color: #dc2626; background: #fef2f2; }
   .status-bar.warn { color: #92400e; background: #fffbeb; }
   .spinner { width:13px; height:13px; border:1.5px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
   @keyframes spin { to{transform:rotate(360deg)} }
 
-  .raw-text-wrap {
-    display: none;
-    margin: 0 16px 12px;
-    padding: 10px 12px;
-    background: #f8f8f6;
-    border: 1px solid #e8e6df;
-    border-radius: 8px;
-    font-size: 11px;
-    color: #666;
-    font-family: monospace;
-    line-height: 1.5;
-    max-height: 80px;
-    overflow-y: auto;
-  }
+  .preview-wrap { display:none; padding: 0 16px 12px; }
+  .preview-row { display: flex; gap: 10px; }
+  .preview-box { flex:1; text-align:center; }
+  .preview-box p { font-size:10px; color:#999; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em; }
+  .preview-box img { width:100%; height:70px; object-fit:cover; border-radius:6px; border:1px solid #e2e0d8; }
 
-  .section-label {
-    font-size: 11px; font-weight: 600; color: #999;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    margin-bottom: 10px;
-  }
+  .raw-text-wrap { display: none; margin: 0 16px 12px; padding: 8px 12px; background: #f8f8f6; border: 1px solid #e8e6df; border-radius: 8px; font-size: 11px; color: #555; font-family: monospace; line-height: 1.5; max-height: 70px; overflow-y: auto; }
 
+  .section-label { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
   .full { grid-column: 1 / -1; }
-
   .field { display:flex; flex-direction:column; gap:5px; }
   .field label { font-size:11px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.05em; }
-  .field input {
-    height:38px; padding:0 12px;
-    border:1px solid #e2e0d8; border-radius:8px;
-    font-size:14px; color:#1a1a1a; background:#fff;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
-  }
+  .field input { height:38px; padding:0 12px; border:1px solid #e2e0d8; border-radius:8px; font-size:14px; color:#1a1a1a; background:#fff; transition: border-color 0.2s, box-shadow 0.2s; }
   .field input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
   .field input.filled { border-color:#22c55e; background:#f0fdf4; }
 
   .actions { display:flex; gap:10px; }
-  .btn-clear {
-    padding:9px 18px; border-radius:8px; border:1px solid #e2e0d8;
-    background:#fff; cursor:pointer; font-size:13px; color:#666; font-weight:500;
-    transition: background 0.15s;
-  }
+  .btn-clear { padding:9px 18px; border-radius:8px; border:1px solid #e2e0d8; background:#fff; cursor:pointer; font-size:13px; color:#666; font-weight:500; }
   .btn-clear:hover { background:#f5f4f0; }
-  .btn-save {
-    flex:1; padding:10px 24px; background:#1d4ed8; color:#fff;
-    border:none; border-radius:8px; font-size:14px; font-weight:600;
-    cursor:pointer; transition:background 0.15s;
-  }
+  .btn-save { flex:1; padding:10px 24px; background:#1d4ed8; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
   .btn-save:hover:not(:disabled) { background:#1e40af; }
   .btn-save:disabled { opacity:0.35; cursor:not-allowed; }
 
-  .success-banner {
-    display:none; background:#f0fdf4; border:1px solid #bbf7d0;
-    border-radius:10px; padding:14px 18px; margin-top:1rem;
-    font-size:13px; color:#166534; line-height:1.5;
-  }
-  .success-banner strong { display:block; font-size:14px; margin-bottom:6px; }
-
-  #rescan-btn {
-    display: none;
-    margin: 0; padding: 0;
-    background: none; border: none;
-    color: #1d4ed8; font-size: 12px; cursor: pointer;
-    text-decoration: underline; margin-left: auto;
-  }
+  #rescan-btn { display:none; background:none; border:none; color:#1d4ed8; font-size:12px; cursor:pointer; text-decoration:underline; }
 </style>
 </head>
 <body>
-
 <div class="app">
   <h1>Address Scanner</h1>
-  <p class="subtitle">No internet or API key needed — runs fully on your device</p>
+  <p class="subtitle">Works offline · No API key needed</p>
 
   <div class="cam-card">
     <div class="cam-header">
@@ -197,11 +100,12 @@
 
     <div class="cam-body">
       <div class="cam-placeholder" id="placeholder">
-        <p>Point your camera at an address label or envelope — reads automatically, no button needed</p>
+        <p>Point camera at address label — hold steady for 2 seconds</p>
         <button class="btn-start" onclick="startScanner()">Start scanner</button>
       </div>
       <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas"></canvas>
+      <canvas id="proc-canvas"></canvas>
       <div class="scan-overlay" id="overlay">
         <div class="scan-frame">
           <div class="sf-c tl"></div><div class="sf-c tr"></div>
@@ -209,282 +113,293 @@
           <div class="scan-line"></div>
         </div>
       </div>
-      <div class="hint" id="hint" style="display:none">Hold steady — align address within the frame</div>
+      <div class="hint" id="hint" style="display:none">Align label within frame · hold still</div>
     </div>
 
-    <div class="status-bar" id="status-bar">
-      <span id="status-msg">Press start to activate camera</span>
+    <div class="status-bar" id="status-bar"><span id="status-msg">Press start to activate camera</span></div>
+
+    <div class="preview-wrap" id="preview-wrap">
+      <div class="preview-row">
+        <div class="preview-box"><p>Original</p><img id="prev-original" alt="original"></div>
+        <div class="preview-box"><p>Processed</p><img id="prev-processed" alt="processed"></div>
+      </div>
     </div>
     <div class="raw-text-wrap" id="raw-text"></div>
   </div>
 
   <p class="section-label">Detected address</p>
-
   <div class="form-grid">
     <div class="field full"><label>Name / recipient</label><input type="text" id="f-name" placeholder="—"></div>
-    <div class="field full"><label>Street address</label><input type="text" id="f-street1" placeholder="—"></div>
-    <div class="field full"><label>Address line 2</label><input type="text" id="f-street2" placeholder="—"></div>
+    <div class="field full"><label>Street / House address</label><input type="text" id="f-street1" placeholder="—"></div>
+    <div class="field full"><label>Area / Locality</label><input type="text" id="f-street2" placeholder="—"></div>
     <div class="field"><label>City</label><input type="text" id="f-city" placeholder="—"></div>
-    <div class="field"><label>State / province</label><input type="text" id="f-state" placeholder="—"></div>
-    <div class="field"><label>ZIP / postal code</label><input type="text" id="f-zip" placeholder="—"></div>
-    <div class="field"><label>Country</label><input type="text" id="f-country" placeholder="—"></div>
-    <div class="field full"><label>Mobile number</label><input type="text" id="f-phone" placeholder="—"></div>
+    <div class="field"><label>State</label><input type="text" id="f-state" placeholder="—"></div>
+    <div class="field"><label>PIN / ZIP code</label><input type="text" id="f-zip" placeholder="—"></div>
+    <div class="field"><label>Mobile</label><input type="text" id="f-mobile" placeholder="—"></div>
   </div>
 
   <div class="actions">
     <button class="btn-clear" onclick="clearAll()">Clear</button>
     <button class="btn-save" id="btn-save" disabled onclick="saveAddress()">Save address</button>
   </div>
-
-  <div class="success-banner" id="success-banner">
-    <strong>Address saved!</strong>
-    <span id="saved-text"></span>
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-  let stream = null;
-  let scanInterval = null;
-  let isScanning = false;
-  let populated = false;
-  let worker = null;
+let stream = null, scanInterval = null, isScanning = false, populated = false, worker = null;
 
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const dot = document.getElementById('dot');
-  const liveLabel = document.getElementById('live-label');
-  const statusBar = document.getElementById('status-bar');
-  const statusMsg = document.getElementById('status-msg');
-  const overlay = document.getElementById('overlay');
-  const hint = document.getElementById('hint');
-  const placeholder = document.getElementById('placeholder');
-  const rawTextEl = document.getElementById('raw-text');
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const procCanvas = document.getElementById('proc-canvas');
+const dot = document.getElementById('dot');
+const liveLabel = document.getElementById('live-label');
+const statusBar = document.getElementById('status-bar');
+const statusMsg = document.getElementById('status-msg');
+const overlay = document.getElementById('overlay');
+const hint = document.getElementById('hint');
+const placeholder = document.getElementById('placeholder');
+const rawTextEl = document.getElementById('raw-text');
 
-  function setStatus(msg, type) {
-    statusBar.className = 'status-bar' + (type ? ' ' + type : '');
-    statusMsg.innerHTML = type === 'scanning'
-      ? '<div class="spinner"></div> ' + msg
-      : msg;
+function setStatus(msg, type) {
+  statusBar.className = 'status-bar' + (type ? ' '+type : '');
+  statusMsg.innerHTML = type === 'scanning' ? '<div class="spinner"></div> '+msg : msg;
+}
+function setDot(state) {
+  dot.className = 'dot'+(state?' '+state:'');
+  liveLabel.textContent = {live:'live',scanning:'reading...',done:'done'}[state]||'ready';
+}
+
+// ── IMAGE PREPROCESSING ──────────────────────────────────────────
+// Converts camera frame to high-contrast grayscale for better OCR
+function preprocessImage(srcCanvas) {
+  const w = srcCanvas.width, h = srcCanvas.height;
+  procCanvas.width = w * 2;   // 2x upscale for better resolution
+  procCanvas.height = h * 2;
+  const ctx = procCanvas.getContext('2d');
+
+  // Upscale
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(srcCanvas, 0, 0, w*2, h*2);
+
+  // Get pixel data
+  const imageData = ctx.getImageData(0, 0, w*2, h*2);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    // Grayscale
+    const gray = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+
+    // Increase contrast
+    const contrast = 1.8;
+    const factor = (259*(contrast*255+255)) / (255*(259-contrast*255));
+    let c = factor*(gray-128)+128;
+
+    // Sharpen by boosting difference from neighbors (simple threshold)
+    c = c > 128 ? Math.min(255, c * 1.2) : Math.max(0, c * 0.7);
+
+    // Adaptive threshold — make it closer to pure black/white
+    const thresh = c > 145 ? 255 : 0;
+
+    data[i] = data[i+1] = data[i+2] = thresh;
+    data[i+3] = 255;
   }
 
-  function setDot(state) {
-    dot.className = 'dot' + (state ? ' ' + state : '');
-    const labels = { live: 'live', scanning: 'reading...', done: 'done' };
-    liveLabel.textContent = labels[state] || 'ready';
-  }
+  ctx.putImageData(imageData, 0, 0);
+  return procCanvas;
+}
 
-  async function initWorker() {
-    setStatus('Loading OCR engine...', 'scanning');
-    worker = await Tesseract.createWorker('eng', 1, {
-      logger: m => {
-        if (m.status === 'recognizing text') {
-          setStatus('Reading text... ' + Math.round(m.progress * 100) + '%', 'scanning');
-        }
+async function initWorker() {
+  setStatus('Loading OCR engine (first time only)...', 'scanning');
+  worker = await Tesseract.createWorker('eng', 1, {
+    logger: m => {
+      if (m.status === 'recognizing text') {
+        setStatus('Reading... '+Math.round(m.progress*100)+'%', 'scanning');
       }
+    }
+  });
+  // Tesseract settings tuned for address labels
+  await worker.setParameters({
+    tessedit_pageseg_mode: '6',      // Assume uniform block of text
+    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,/-#\n',
+    preserve_interword_spaces: '1',
+  });
+}
+
+async function startScanner() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: {ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} }
     });
-    await worker.setParameters({
-      tessedit_pageseg_mode: '6',   // Assume uniform block of text
-      tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,/-#+()',
-    });
+    video.srcObject = stream;
+    video.style.display = 'block';
+    placeholder.style.display = 'none';
+    overlay.style.display = 'flex';
+    hint.style.display = 'block';
+    setDot('live');
+    await initWorker();
+    setStatus('Scanning every 5s — hold label steady in the frame...');
+    scanInterval = setInterval(captureAndScan, 5000);
+    setTimeout(captureAndScan, 2000);
+  } catch(e) {
+    setStatus('Camera access denied — allow camera and refresh.', 'err');
   }
+}
 
-  async function startScanner() {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-      video.srcObject = stream;
-      video.style.display = 'block';
-      placeholder.style.display = 'none';
-      overlay.style.display = 'flex';
-      hint.style.display = 'block';
-      setDot('live');
-      setStatus('Initializing OCR engine...');
+function captureFrame() {
+  if (!video.videoWidth) return null;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  return canvas;
+}
 
-      await initWorker();
+async function captureAndScan() {
+  if (isScanning || populated) return;
+  const frame = captureFrame();
+  if (!frame) return;
+  isScanning = true;
+  setDot('scanning');
+  setStatus('Processing image...', 'scanning');
 
-      setStatus('Scanning every 5 seconds — hold label steady in the frame...');
-      scanInterval = setInterval(captureAndScan, 5000);
-      setTimeout(captureAndScan, 1800);
-    } catch (e) {
-      setStatus('Camera access denied — please allow camera and refresh.', 'err');
+  // Show previews
+  const prevWrap = document.getElementById('preview-wrap');
+  document.getElementById('prev-original').src = frame.toDataURL();
+  const processed = preprocessImage(frame);
+  document.getElementById('prev-processed').src = processed.toDataURL();
+  prevWrap.style.display = 'block';
+
+  try {
+    const { data: { text } } = await worker.recognize(processed);
+    const cleaned = text.trim();
+
+    rawTextEl.style.display = 'block';
+    rawTextEl.textContent = '📄 Raw OCR: ' + cleaned;
+
+    if (!cleaned || cleaned.length < 8) {
+      setDot('live'); setStatus('No text found — hold label closer and steady', 'warn');
+      isScanning = false; return;
+    }
+
+    const parsed = parseIndianAddress(cleaned);
+    if (!parsed.street1 && !parsed.city && !parsed.zip) {
+      setDot('live'); setStatus('Text found but address unclear — try again', 'warn');
+    } else {
+      populateForm(parsed);
+    }
+  } catch(e) {
+    setDot('live'); setStatus('OCR error — retrying...', 'err');
+  }
+  isScanning = false;
+}
+
+// ── ADDRESS PARSER (tuned for Indian labels) ──────────────────────
+function parseIndianAddress(text) {
+  const result = { name:'', street1:'', street2:'', city:'', state:'', zip:'', mobile:'' };
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+
+  lines.forEach(line => {
+    const l = line.toLowerCase();
+
+    // PIN code (6 digits for India, 5 for US)
+    const pinMatch = line.match(/\b(\d{6}|\d{5}(?:-\d{4})?)\b/);
+    if (pinMatch && !result.zip) result.zip = pinMatch[1];
+
+    // Mobile number (10 digits, possibly with country code)
+    const mobMatch = line.match(/(?:mobile[^0-9]*|number[^0-9]*)?(\+?91[-\s]?)?([6-9]\d{9})/i);
+    if (mobMatch && !result.mobile) result.mobile = mobMatch[2];
+
+    // State (handles "state up", "state: maharashtra" etc)
+    const stateMatch = line.match(/state[^a-z]*([a-z\s]+)/i);
+    if (stateMatch && !result.state) result.state = stateMatch[1].trim();
+
+    // House/flat number line
+    if (/house|flat|plot|door|h\.?no|f\.?no|villa|block/i.test(l) && !result.street1) {
+      result.street1 = line.replace(/house no\.?\s*[-:]/i,'House No. ').trim();
+    }
+
+    // Area/locality line
+    if (/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|extension|phase)/i.test(l) && !result.street2) {
+      result.street2 = line.trim();
+    }
+
+    // City — after PIN or standalone known city pattern
+    if (pinMatch && !result.city) {
+      const cityGuess = line.replace(pinMatch[0],'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
+      if (cityGuess.length > 2) result.city = cityGuess;
+    }
+  });
+
+  // Name — first line that's not an address keyword
+  for (const line of lines) {
+    const l = line.toLowerCase();
+    if (!/house|flat|plot|pin|state|mobile|order|no\.|nagar|colony|\d{6}|\d{10}/.test(l) && line.length > 3) {
+      result.name = line; break;
     }
   }
 
-  function captureFrame() {
-    if (!video.videoWidth) return null;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
-    return canvas;
-  }
-
-  async function captureAndScan() {
-    if (isScanning || populated) return;
-    const frame = captureFrame();
-    if (!frame) return;
-
-    isScanning = true;
-    setDot('scanning');
-    setStatus('Reading text...', 'scanning');
-
-    try {
-      const { data: { text } } = await worker.recognize(frame);
-      const cleaned = text.trim();
-
-      if (!cleaned || cleaned.length < 10) {
-        setDot('live');
-        setStatus('No text detected — hold label steady in the frame...');
-        isScanning = false;
-        return;
-      }
-
-      rawTextEl.style.display = 'block';
-      rawTextEl.textContent = cleaned;
-
-      const parsed = parseAddress(cleaned);
-
-      if (!parsed.street1 && !parsed.city && !parsed.zip) {
-        setDot('live');
-        setStatus('Text found but no address detected — try again', 'warn');
-      } else {
-        populateForm(parsed);
-      }
-    } catch (e) {
-      setDot('live');
-      setStatus('OCR failed — retrying...', 'err');
-    }
-
-    isScanning = false;
-  }
-
-  function parseAddress(text) {
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
-    const full = lines.join(' ');
-    const result = { name: '', street1: '', street2: '', city: '', state: '', zip: '', phone: '' };
-
-    // PIN code (6 digits, Indian format)
-    const pinMatch = full.match(/\b(\d{6})\b/);
-    if (pinMatch) result.zip = pinMatch[1];
-
-    // Mobile number (10 digits, optionally starting with +91 or 91)
-    const phoneMatch = full.match(/(?:\+91|91)?[\s\-]?([6-9]\d{9})/);
-    if (phoneMatch) result.phone = phoneMatch[1];
-
-    // State: look for "State <name>" or "state: <name>"
-    const stateMatch = full.match(/state[\s:\-]+([a-zA-Z\s]+?)(?:\s+pin|\s+\d{6}|$)/i);
-    if (stateMatch) result.state = stateMatch[1].trim();
-
-    // Name: first line that looks like a person's name (starts with Mr/Mrs/Ms or is all alpha words)
+  // City fallback — line containing PIN if city still empty
+  if (!result.city && result.zip) {
     for (const line of lines) {
-      if (/^(mr|mrs|ms|dr|shri|smt)[\s.]/i.test(line)) { result.name = line; break; }
-    }
-    if (!result.name) {
-      // first line that has no digits and no keywords
-      for (const line of lines) {
-        if (!/\d/.test(line) && !/^(state|pin|mobile|house|flat|door|order|ordee)/i.test(line)) {
-          result.name = line; break;
-        }
+      if (line.includes(result.zip)) {
+        const c = line.replace(result.zip,'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
+        if (c.length > 2) result.city = c;
       }
     }
-
-    // House / flat number: line with "House no", "Flat", "Door", "H.No" etc
-    const houseLineMatch = lines.find(l => /\b(house|flat|door|h\.?no|plot|shop)\b/i.test(l));
-    if (houseLineMatch) {
-      result.street1 = houseLineMatch;
-      // Next line(s) until city/state/pin are area/locality
-      const idx = lines.indexOf(houseLineMatch);
-      const areaLines = [];
-      for (let i = idx + 1; i < lines.length; i++) {
-        const l = lines[i];
-        if (/\b(state|pin|mobile|order|ordee)\b/i.test(l)) break;
-        if (/\d{6}/.test(l) || /^\d{10}$/.test(l.replace(/\s/,''))) break;
-        areaLines.push(l);
-      }
-      if (areaLines.length) result.street2 = areaLines.join(', ');
-    }
-
-    // City: last non-keyword town/city word before pin, or repeated city name
-    // Look for a line that appears to be just a city (alpha only, no keywords)
-    const cityCandidate = lines.find(l =>
-      /^[a-zA-Z\s]+$/.test(l) &&
-      !/^(state|pin|mobile|house|flat|order|ordee|india)/i.test(l) &&
-      l !== result.name &&
-      l.split(' ').length <= 3 &&
-      l.length > 3
-    );
-    if (cityCandidate) result.city = cityCandidate;
-
-    // Fallback: extract city from the area string (last word before pin line)
-    if (!result.city && result.street2) {
-      const words = result.street2.split(/[\s,]+/);
-      result.city = words[words.length - 1];
-    }
-
-    return result;
   }
 
-  function populateForm(addr) {
-    const map = {
-      'f-name': addr.name, 'f-street1': addr.street1,
-      'f-street2': addr.street2, 'f-city': addr.city,
-      'f-state': addr.state, 'f-zip': addr.zip,
-      'f-country': addr.country, 'f-phone': addr.phone
-    };
-    Object.entries(map).forEach(([id, val]) => {
-      const el = document.getElementById(id);
-      if (el && val) { el.value = val; el.classList.add('filled'); }
-    });
-    populated = true;
-    clearInterval(scanInterval);
-    if (stream) stream.getTracks().forEach(t => t.stop());
-    video.style.display = 'none';
-    overlay.style.display = 'none';
-    hint.style.display = 'none';
-    setDot('done');
-    setStatus('Address detected and filled in!', 'ok');
-    document.getElementById('btn-save').disabled = false;
-    document.getElementById('rescan-btn').style.display = 'block';
-  }
+  // Clean up
+  Object.keys(result).forEach(k => { result[k] = result[k].replace(/\s+/g,' ').trim(); });
+  return result;
+}
 
-  function rescan() {
-    clearAll();
-    document.getElementById('rescan-btn').style.display = 'none';
-    startScanner();
-  }
+function populateForm(addr) {
+  const map = { 'f-name':addr.name, 'f-street1':addr.street1, 'f-street2':addr.street2, 'f-city':addr.city, 'f-state':addr.state, 'f-zip':addr.zip, 'f-mobile':addr.mobile };
+  Object.entries(map).forEach(([id,val]) => {
+    const el = document.getElementById(id);
+    if (el && val) { el.value = val; el.classList.add('filled'); }
+  });
+  populated = true;
+  clearInterval(scanInterval);
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  video.style.display = 'none';
+  overlay.style.display = 'none';
+  hint.style.display = 'none';
+  setDot('done');
+  setStatus('Address detected and filled in!', 'ok');
+  document.getElementById('btn-save').disabled = false;
+  document.getElementById('rescan-btn').style.display = 'block';
+}
 
-  function clearAll() {
-    ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-country','f-phone'].forEach(id => {
-      const el = document.getElementById(id);
-      el.value = ''; el.classList.remove('filled');
-    });
-    document.getElementById('btn-save').disabled = true;
-    document.getElementById('success-banner').style.display = 'none';
-    rawTextEl.style.display = 'none';
-    rawTextEl.textContent = '';
-    populated = false;
-    clearInterval(scanInterval);
-    if (stream) stream.getTracks().forEach(t => t.stop());
-    stream = null;
-    video.style.display = 'none';
-    overlay.style.display = 'none';
-    hint.style.display = 'none';
-    placeholder.style.display = 'flex';
-    setDot('');
-    liveLabel.textContent = 'ready';
-    setStatus('Press start to activate camera');
-  }
+function rescan() {
+  clearAll();
+  document.getElementById('rescan-btn').style.display = 'none';
+  startScanner();
+}
 
-  function saveAddress() {
-    const fields = ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-country','f-phone'];
-    const vals = fields.map(id => document.getElementById(id).value).filter(Boolean);
-    const banner = document.getElementById('success-banner');
-    document.getElementById('saved-text').textContent = vals.join(', ');
-    banner.style.display = 'block';
-    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+function clearAll() {
+  ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = ''; el.classList.remove('filled');
+  });
+  document.getElementById('btn-save').disabled = true;
+  rawTextEl.style.display = 'none';
+  document.getElementById('preview-wrap').style.display = 'none';
+  populated = false;
+  clearInterval(scanInterval);
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null;
+  video.style.display = 'none';
+  overlay.style.display = 'none';
+  hint.style.display = 'none';
+  placeholder.style.display = 'flex';
+  setDot(''); liveLabel.textContent = 'ready';
+  setStatus('Press start to activate camera');
+}
+
+function saveAddress() {
+  alert('Saved:\n' + ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile'].map(id => document.getElementById(id).value).filter(Boolean).join('\n'));
+}
 </script>
 </body>
 </html>
