@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Address Scanner</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f4f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    color: #1a1a1a;
+  }
+
+  .app { width: 100%; max-width: 560px; }
+
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.25rem; }
+
+  .cam-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e2e0d8;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+
+  .cam-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 16px;
+    border-bottom: 1px solid #f0ede6;
+  }
+  .cam-title { font-size: 13px; font-weight: 600; }
+  .live-pill {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: #888; font-weight: 500;
+    background: #f5f4f0; border-radius: 20px; padding: 4px 10px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; transition: background 0.3s; }
+  .dot.live { background: #22c55e; animation: pulse 1.5s infinite; }
+  .dot.scanning { background: #f59e0b; animation: pulse 0.7s infinite; }
+  .dot.done { background: #22c55e; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .cam-body {
+    background: #111;
+    position: relative;
+    min-height: 220px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  #video { width: 100%; display: none; max-height: 280px; object-fit: cover; }
+  #canvas { display: none; }
+
+  .cam-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    padding: 2.5rem 2rem; text-align: center;
+  }
+  .cam-placeholder p { font-size: 13px; color: #aaa; max-width: 280px; line-height: 1.55; }
+
+  .btn-start {
+    padding: 10px 26px; background: #1d4ed8; color: #fff;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-start:hover { background: #1e40af; }
+
+  .scan-overlay {
+    position: absolute; inset: 0;
+    display: none; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .scan-frame {
+    width: 82%; max-width: 380px; height: 90px;
+    border: 1.5px solid rgba(99,179,237,0.65);
+    border-radius: 6px; position: relative; overflow: hidden;
+  }
+  .sf-c { position: absolute; width: 16px; height: 16px; }
+  .sf-c.tl { top:-2px;left:-2px; border-top:2.5px solid #60a5fa; border-left:2.5px solid #60a5fa; border-radius:3px 0 0 0; }
+  .sf-c.tr { top:-2px;right:-2px; border-top:2.5px solid #60a5fa; border-right:2.5px solid #60a5fa; border-radius:0 3px 0 0; }
+  .sf-c.bl { bottom:-2px;left:-2px; border-bottom:2.5px solid #60a5fa; border-left:2.5px solid #60a5fa; border-radius:0 0 0 3px; }
+  .sf-c.br { bottom:-2px;right:-2px; border-bottom:2.5px solid #60a5fa; border-right:2.5px solid #60a5fa; border-radius:0 0 3px 0; }
+  .scan-line {
+    position: absolute; left:0; right:0; height:2px;
+    background: rgba(96,165,250,0.75);
+    animation: scanmove 2s ease-in-out infinite;
+  }
+  @keyframes scanmove { 0%{top:0} 100%{top:100%} }
+
+  .hint {
+    position: absolute; bottom: 10px; left: 0; right: 0;
+    text-align: center; font-size: 11px; color: rgba(255,255,255,0.6);
+    pointer-events: none;
+  }
+
+  .status-bar {
+    padding: 9px 16px; font-size: 12px; min-height: 36px;
+    display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid #f0ede6; color: #888; background: #fff;
+    transition: background 0.2s, color 0.2s;
+  }
+  .status-bar.ok { color: #16a34a; background: #f0fdf4; }
+  .status-bar.err { color: #dc2626; background: #fef2f2; }
+  .status-bar.warn { color: #92400e; background: #fffbeb; }
+  .spinner { width:13px; height:13px; border:1.5px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  .raw-text-wrap {
+    display: none;
+    margin: 0 16px 12px;
+    padding: 10px 12px;
+    background: #f8f8f6;
+    border: 1px solid #e8e6df;
+    border-radius: 8px;
+    font-size: 11px;
+    color: #666;
+    font-family: monospace;
+    line-height: 1.5;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  .section-label {
+    font-size: 11px; font-weight: 600; color: #999;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+  .full { grid-column: 1 / -1; }
+
+  .field { display:flex; flex-direction:column; gap:5px; }
+  .field label { font-size:11px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.05em; }
+  .field input {
+    height:38px; padding:0 12px;
+    border:1px solid #e2e0d8; border-radius:8px;
+    font-size:14px; color:#1a1a1a; background:#fff;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
+  }
+  .field input:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
+  .field input.filled { border-color:#22c55e; background:#f0fdf4; }
+
+  .actions { display:flex; gap:10px; }
+  .btn-clear {
+    padding:9px 18px; border-radius:8px; border:1px solid #e2e0d8;
+    background:#fff; cursor:pointer; font-size:13px; color:#666; font-weight:500;
+    transition: background 0.15s;
+  }
+  .btn-clear:hover { background:#f5f4f0; }
+  .btn-save {
+    flex:1; padding:10px 24px; background:#1d4ed8; color:#fff;
+    border:none; border-radius:8px; font-size:14px; font-weight:600;
+    cursor:pointer; transition:background 0.15s;
+  }
+  .btn-save:hover:not(:disabled) { background:#1e40af; }
+  .btn-save:disabled { opacity:0.35; cursor:not-allowed; }
+
+  .success-banner {
+    display:none; background:#f0fdf4; border:1px solid #bbf7d0;
+    border-radius:10px; padding:14px 18px; margin-top:1rem;
+    font-size:13px; color:#166534; line-height:1.5;
+  }
+  .success-banner strong { display:block; font-size:14px; margin-bottom:6px; }
+
+  #rescan-btn {
+    display: none;
+    margin: 0; padding: 0;
+    background: none; border: none;
+    color: #1d4ed8; font-size: 12px; cursor: pointer;
+    text-decoration: underline; margin-left: auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <h1>Address Scanner</h1>
+  <p class="subtitle">No internet or API key needed — runs fully on your device</p>
+
+  <div class="cam-card">
+    <div class="cam-header">
+      <span class="cam-title">Live camera</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button id="rescan-btn" onclick="rescan()">Scan again</button>
+        <div class="live-pill">
+          <div class="dot" id="dot"></div>
+          <span id="live-label">ready</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cam-body">
+      <div class="cam-placeholder" id="placeholder">
+        <p>Point your camera at an address label or envelope — reads automatically, no button needed</p>
+        <button class="btn-start" onclick="startScanner()">Start scanner</button>
+      </div>
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="scan-overlay" id="overlay">
+        <div class="scan-frame">
+          <div class="sf-c tl"></div><div class="sf-c tr"></div>
+          <div class="sf-c bl"></div><div class="sf-c br"></div>
+          <div class="scan-line"></div>
+        </div>
+      </div>
+      <div class="hint" id="hint" style="display:none">Hold steady — align address within the frame</div>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+      <span id="status-msg">Press start to activate camera</span>
+    </div>
+    <div class="raw-text-wrap" id="raw-text"></div>
+  </div>
+
+  <p class="section-label">Detected address</p>
+
+  <div class="form-grid">
+    <div class="field full"><label>Name / recipient</label><input type="text" id="f-name" placeholder="—"></div>
+    <div class="field full"><label>Street address</label><input type="text" id="f-street1" placeholder="—"></div>
+    <div class="field full"><label>Address line 2</label><input type="text" id="f-street2" placeholder="—"></div>
+    <div class="field"><label>City</label><input type="text" id="f-city" placeholder="—"></div>
+    <div class="field"><label>State / province</label><input type="text" id="f-state" placeholder="—"></div>
+    <div class="field"><label>ZIP / postal code</label><input type="text" id="f-zip" placeholder="—"></div>
+    <div class="field"><label>Country</label><input type="text" id="f-country" placeholder="—"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-clear" onclick="clearAll()">Clear</button>
+    <button class="btn-save" id="btn-save" disabled onclick="saveAddress()">Save address</button>
+  </div>
+
+  <div class="success-banner" id="success-banner">
+    <strong>Address saved!</strong>
+    <span id="saved-text"></span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+  let stream = null;
+  let scanInterval = null;
+  let isScanning = false;
+  let populated = false;
+  let worker = null;
+
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const dot = document.getElementById('dot');
+  const liveLabel = document.getElementById('live-label');
+  const statusBar = document.getElementById('status-bar');
+  const statusMsg = document.getElementById('status-msg');
+  const overlay = document.getElementById('overlay');
+  const hint = document.getElementById('hint');
+  const placeholder = document.getElementById('placeholder');
+  const rawTextEl = document.getElementById('raw-text');
+
+  function setStatus(msg, type) {
+    statusBar.className = 'status-bar' + (type ? ' ' + type : '');
+    statusMsg.innerHTML = type === 'scanning'
+      ? '<div class="spinner"></div> ' + msg
+      : msg;
+  }
+
+  function setDot(state) {
+    dot.className = 'dot' + (state ? ' ' + state : '');
+    const labels = { live: 'live', scanning: 'reading...', done: 'done' };
+    liveLabel.textContent = labels[state] || 'ready';
+  }
+
+  async function initWorker() {
+    setStatus('Loading OCR engine...', 'scanning');
+    worker = await Tesseract.createWorker('eng', 1, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          setStatus('Reading text... ' + Math.round(m.progress * 100) + '%', 'scanning');
+        }
+      }
+    });
+  }
+
+  async function startScanner() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      video.srcObject = stream;
+      video.style.display = 'block';
+      placeholder.style.display = 'none';
+      overlay.style.display = 'flex';
+      hint.style.display = 'block';
+      setDot('live');
+      setStatus('Initializing OCR engine...');
+
+      await initWorker();
+
+      setStatus('Scanning every 5 seconds — hold label steady in the frame...');
+      scanInterval = setInterval(captureAndScan, 5000);
+      setTimeout(captureAndScan, 1800);
+    } catch (e) {
+      setStatus('Camera access denied — please allow camera and refresh.', 'err');
+    }
+  }
+
+  function captureFrame() {
+    if (!video.videoWidth) return null;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    return canvas;
+  }
+
+  async function captureAndScan() {
+    if (isScanning || populated) return;
+    const frame = captureFrame();
+    if (!frame) return;
+
+    isScanning = true;
+    setDot('scanning');
+    setStatus('Reading text...', 'scanning');
+
+    try {
+      const { data: { text } } = await worker.recognize(frame);
+      const cleaned = text.trim();
+
+      if (!cleaned || cleaned.length < 10) {
+        setDot('live');
+        setStatus('No text detected — hold label steady in the frame...');
+        isScanning = false;
+        return;
+      }
+
+      rawTextEl.style.display = 'block';
+      rawTextEl.textContent = cleaned;
+
+      const parsed = parseAddress(cleaned);
+
+      if (!parsed.street1 && !parsed.city && !parsed.zip) {
+        setDot('live');
+        setStatus('Text found but no address detected — try again', 'warn');
+      } else {
+        populateForm(parsed);
+      }
+    } catch (e) {
+      setDot('live');
+      setStatus('OCR failed — retrying...', 'err');
+    }
+
+    isScanning = false;
+  }
+
+  function parseAddress(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+
+    const result = { name: '', street1: '', street2: '', city: '', state: '', zip: '', country: '' };
+
+    const zipPattern = /\b(\d{5}(?:-\d{4})?)\b/;
+    const statePattern = /\b(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC)\b/;
+    const streetPattern = /^\d+\s+\w/;
+    const aptPattern = /\b(apt|apartment|suite|ste|unit|floor|fl|#)\b/i;
+    const countryPattern = /\b(usa|united states|us|canada|uk|united kingdom|australia|india)\b/i;
+
+    let streetLineIdx = -1;
+
+    lines.forEach((line, i) => {
+      const zipMatch = line.match(zipPattern);
+      const stateMatch = line.match(statePattern);
+
+      if (zipMatch) result.zip = zipMatch[1];
+
+      if (stateMatch && !result.state) {
+        result.state = stateMatch[1];
+        const cityMatch = line.replace(statePattern, '').replace(zipPattern, '').replace(/,/g, '').trim();
+        if (cityMatch.length > 1) result.city = cityMatch;
+      }
+
+      if (streetPattern.test(line) && streetLineIdx === -1) {
+        if (aptPattern.test(line)) {
+          result.street2 = line;
+        } else {
+          result.street1 = line;
+          streetLineIdx = i;
+        }
+      } else if (streetLineIdx !== -1 && i === streetLineIdx + 1 && aptPattern.test(line)) {
+        result.street2 = line;
+      }
+
+      const countryMatch = line.match(countryPattern);
+      if (countryMatch) result.country = line.replace(/,/g, '').trim();
+    });
+
+    if (!result.street1 && !result.city) {
+      lines.forEach(line => {
+        if (/\d/.test(line) && line.length > 5 && !result.street1) result.street1 = line;
+      });
+    }
+
+    if (!result.name && lines.length > 0) {
+      const firstLine = lines[0];
+      if (!streetPattern.test(firstLine) && !firstLine.match(zipPattern) && !firstLine.match(statePattern)) {
+        result.name = firstLine;
+      }
+    }
+
+    Object.keys(result).forEach(k => { result[k] = result[k].replace(/[^a-zA-Z0-9\s,.\-#]/g, '').trim(); });
+    return result;
+  }
+
+  function populateForm(addr) {
+    const map = {
+      'f-name': addr.name, 'f-street1': addr.street1,
+      'f-street2': addr.street2, 'f-city': addr.city,
+      'f-state': addr.state, 'f-zip': addr.zip, 'f-country': addr.country
+    };
+    Object.entries(map).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val) { el.value = val; el.classList.add('filled'); }
+    });
+    populated = true;
+    clearInterval(scanInterval);
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    video.style.display = 'none';
+    overlay.style.display = 'none';
+    hint.style.display = 'none';
+    setDot('done');
+    setStatus('Address detected and filled in!', 'ok');
+    document.getElementById('btn-save').disabled = false;
+    document.getElementById('rescan-btn').style.display = 'block';
+  }
+
+  function rescan() {
+    clearAll();
+    document.getElementById('rescan-btn').style.display = 'none';
+    startScanner();
+  }
+
+  function clearAll() {
+    ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-country'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = ''; el.classList.remove('filled');
+    });
+    document.getElementById('btn-save').disabled = true;
+    document.getElementById('success-banner').style.display = 'none';
+    rawTextEl.style.display = 'none';
+    rawTextEl.textContent = '';
+    populated = false;
+    clearInterval(scanInterval);
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    video.style.display = 'none';
+    overlay.style.display = 'none';
+    hint.style.display = 'none';
+    placeholder.style.display = 'flex';
+    setDot('');
+    liveLabel.textContent = 'ready';
+    setStatus('Press start to activate camera');
+  }
+
+  function saveAddress() {
+    const fields = ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-country'];
+    const vals = fields.map(id => document.getElementById(id).value).filter(Boolean);
+    const banner = document.getElementById('success-banner');
+    document.getElementById('saved-text').textContent = vals.join(', ');
+    banner.style.display = 'block';
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+</script>
+</body>
+</html>
