@@ -11,6 +11,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
 .subtitle{font-size:13px;color:#888;margin-bottom:1rem}
 
+/* API KEY */
+.api-box{background:#fff;border:1px solid #e2e0d8;border-radius:12px;padding:14px 16px;margin-bottom:1rem}
+.api-box label{font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px}
+.api-row{display:flex;gap:8px}
+.api-row input{flex:1;height:36px;padding:0 10px;border:1px solid #e2e0d8;border-radius:8px;font-size:13px;font-family:monospace;color:#1a1a1a}
+.api-row input:focus{outline:none;border-color:#3b82f6}
+.btn-save-key{padding:0 14px;height:36px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-save-key:hover{background:#1e40af}
+.key-note{font-size:11px;margin-top:7px;color:#888;line-height:1.5}
+.key-note a{color:#1d4ed8}
+.key-ok{color:#16a34a;font-weight:600}
+
 /* TABS */
 .tabs{display:flex;gap:0;margin-bottom:1rem;background:#e8e6df;border-radius:10px;padding:3px}
 .tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;color:#888;border:none;background:none;transition:all .15s}
@@ -27,7 +39,7 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
 .dot.done{background:#22c55e}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* CAMERA PANEL */
+/* CAMERA */
 .cam-body{background:#111;position:relative;min-height:460px;display:flex;align-items:center;justify-content:center}
 #video{width:100%;display:none;height:460px;object-fit:cover}
 #canvas{display:none}
@@ -37,7 +49,7 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
 .scan-overlay svg{width:100%;height:100%}
 .hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,.65);pointer-events:none}
 
-/* UPLOAD PANEL */
+/* UPLOAD */
 .upload-panel{padding:1.5rem}
 .drop-zone{position:relative;border:2px dashed #d0cdc4;border-radius:12px;padding:2.5rem 1rem;text-align:center;background:#fafaf8;transition:all .15s;overflow:hidden}
 .drop-zone.drag{border-color:#3b82f6;background:#eff6ff}
@@ -46,8 +58,6 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
 .drop-zone p{font-size:13px;color:#999}
 .drop-zone input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:5}
 #preview-img{display:none;width:100%;max-height:280px;object-fit:contain;border-radius:10px;border:1px solid #e2e0d8;margin-top:12px;background:#f8f8f6}
-.btn-scan-img{display:none;width:100%;margin-top:12px;padding:10px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
-.btn-scan-img:hover{background:#1e40af}
 
 /* STATUS */
 .status-bar{padding:9px 16px;font-size:12px;min-height:36px;display:flex;align-items:center;gap:8px;border-top:1px solid #f0ede6;color:#888;transition:background .2s,color .2s}
@@ -83,8 +93,22 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
 <body>
 <div class="app">
   <h1>Address Scanner</h1>
-  <p class="subtitle">100% free · No API key · Works offline</p>
+  <p class="subtitle">Powered by OCR.space · 25,000 free scans/month</p>
 
+  <!-- API KEY BOX -->
+  <div class="api-box">
+    <label>OCR.space API Key</label>
+    <div class="api-row">
+      <input type="password" id="api-key-input" placeholder="helloworld (default free key)">
+      <button class="btn-save-key" onclick="saveKey()">Save</button>
+    </div>
+    <div class="key-note" id="key-note">
+      Get a free key (25k scans/month) → <a href="https://ocr.space/ocrapi/freekey" target="_blank">ocr.space/ocrapi/freekey</a> · just enter your email.<br>
+      Or try the default key: <strong>helloworld</strong> (rate limited but works for testing)
+    </div>
+  </div>
+
+  <!-- TABS -->
   <div class="tabs">
     <button class="tab active" id="tab-btn-camera" onclick="switchTab('camera')">📷 Camera</button>
     <button class="tab" id="tab-btn-upload" onclick="switchTab('upload')">🖼️ Upload Image</button>
@@ -99,7 +123,7 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
       </div>
     </div>
 
-    <!-- CAMERA -->
+    <!-- CAMERA PANEL -->
     <div id="panel-camera">
       <div class="cam-body">
         <div class="placeholder" id="placeholder">
@@ -128,21 +152,20 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
       </div>
     </div>
 
-    <!-- UPLOAD -->
+    <!-- UPLOAD PANEL -->
     <div id="panel-upload" style="display:none">
       <div class="upload-panel">
         <div class="drop-zone" id="drop-zone">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <strong>Tap here to choose image</strong>
-          <p>Supports JPG, PNG, HEIC</p>
-          <input type="file" id="file-input" accept="image/*,image/heic">
+          <p>Scans automatically on selection</p>
+          <input type="file" id="file-input" accept="image/*">
         </div>
         <img id="preview-img" alt="label preview">
-        <button class="btn-scan-img" id="btn-scan-img" onclick="scanUpload()">Scan this image</button>
       </div>
     </div>
 
-    <div class="status-bar" id="status-bar"><span id="status-msg">Press start to activate camera</span></div>
+    <div class="status-bar" id="status-bar"><span id="status-msg">Enter API key above then start</span></div>
     <div class="raw" id="raw"></div>
   </div>
 
@@ -163,11 +186,10 @@ h1{font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-.02em}
   <div class="success" id="success"><strong>Address saved!</strong><span id="saved-text"></span></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 <script>
-let stream=null, scanTimer=null, busy=false, done=false, worker=null, tab='camera', uploadImg=null;
+let stream=null, scanTimer=null, busy=false, done=false, tab='camera', apiKey='helloworld';
 
-// ── UI HELPERS ────────────────────────────────────────────────────
+// ── UI ────────────────────────────────────────────────────────────
 function setStatus(msg,type){
   const b=document.getElementById('status-bar');
   b.className='status-bar'+(type?' '+type:'');
@@ -176,6 +198,14 @@ function setStatus(msg,type){
 function setDot(s){
   document.getElementById('dot').className='dot'+(s?' '+s:'');
   document.getElementById('dot-label').textContent={live:'live',scanning:'reading...',done:'done'}[s]||'ready';
+}
+
+// ── API KEY ───────────────────────────────────────────────────────
+function saveKey(){
+  const val=document.getElementById('api-key-input').value.trim();
+  if(!val){alert('Please enter an API key');return;}
+  apiKey=val;
+  document.getElementById('key-note').innerHTML='<span class="key-ok">✓ API key saved</span>';
 }
 
 // ── TABS ──────────────────────────────────────────────────────────
@@ -191,194 +221,202 @@ function switchTab(t){
 
 // ── FILE UPLOAD ───────────────────────────────────────────────────
 document.getElementById('file-input').addEventListener('change', function(){
-  const file = this.files[0];
+  const file=this.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
-    uploadImg = e.target.result;
-    const img = document.getElementById('preview-img');
-    img.src = uploadImg;
-    img.style.display = 'block';
-    document.getElementById('btn-scan-img').style.display = 'none';
-    scanUpload();
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const prev=document.getElementById('preview-img');
+    prev.src=e.target.result;
+    prev.style.display='block';
+    scanWithOCRSpace(e.target.result.split(',')[1], file.type||'image/jpeg');
   };
   reader.readAsDataURL(file);
 });
 
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('drag'); });
-dz.addEventListener('dragleave', ()=> dz.classList.remove('drag'));
-dz.addEventListener('drop', e=>{
-  e.preventDefault(); dz.classList.remove('drag');
-  const file = e.dataTransfer.files[0];
+const dz=document.getElementById('drop-zone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('drag');
+  const file=e.dataTransfer.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    uploadImg = ev.target.result;
-    const img = document.getElementById('preview-img');
-    img.src = uploadImg; img.style.display='block';
-    document.getElementById('btn-scan-img').style.display='none';
-    scanUpload();
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const prev=document.getElementById('preview-img');
+    prev.src=ev.target.result; prev.style.display='block';
+    scanWithOCRSpace(ev.target.result.split(',')[1], file.type||'image/jpeg');
   };
   reader.readAsDataURL(file);
 });
-
-async function scanUpload(){
-  if(!uploadImg){ setStatus('No image loaded','warn'); return; }
-  setDot('scanning'); setStatus('Scanning image...','scanning');
-  await ensureWorker();
-  const image = new Image();
-  image.onload = async function(){
-    const c = document.createElement('canvas');
-    c.width=image.width; c.height=image.height;
-    c.getContext('2d').drawImage(image,0,0);
-    const p = preprocess(c);
-    await runOCR(p);
-  };
-  image.src = uploadImg;
-}
-
-// ── WORKER ────────────────────────────────────────────────────────
-async function ensureWorker(){
-  if(worker) return;
-  setStatus('Loading OCR engine (one-time)...','scanning');
-  worker = await Tesseract.createWorker('eng', 1, {
-    workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
-    langPath: 'https://tessdata.projectnaptha.com/4.0.0',
-    corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core-simd-lstm.wasm.js',
-    logger: m => {
-      if (m.status === 'loading tesseract core') setStatus('Loading OCR core...', 'scanning');
-      if (m.status === 'initializing tesseract') setStatus('Initializing OCR...', 'scanning');
-      if (m.status === 'loading language traineddata') setStatus('Loading language data...', 'scanning');
-      if (m.status === 'recognizing text') setStatus('Reading... ' + Math.round(m.progress * 100) + '%', 'scanning');
-    }
-  });
-  await worker.setParameters({ tessedit_pageseg_mode:'6', tessedit_ocr_engine_mode:'3', preserve_interword_spaces:'1' });
-}
-
-// ── PREPROCESS ────────────────────────────────────────────────────
-function preprocess(src){
-  const w=src.width*2, h=src.height*2;
-  const out=document.createElement('canvas');
-  out.width=w; out.height=h;
-  const ctx=out.getContext('2d');
-  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
-  ctx.drawImage(src,0,0,w,h);
-  const id=ctx.getImageData(0,0,w,h); const d=id.data;
-  for(let i=0;i<d.length;i+=4){ const g=Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2]); d[i]=d[i+1]=d[i+2]=g; }
-  let sum=0; for(let i=0;i<d.length;i+=4) sum+=d[i];
-  const thr=(sum/(d.length/4))*.85;
-  for(let i=0;i<d.length;i+=4){ const v=d[i]<thr?0:255; d[i]=d[i+1]=d[i+2]=v; d[i+3]=255; }
-  ctx.putImageData(id,0,0);
-  return out;
-}
-
-// ── OCR WITH CONFIDENCE FILTER ────────────────────────────────────
-async function runOCR(processedCanvas){
-  try{
-    const {data} = await worker.recognize(processedCanvas,{},{hocr:true});
-    let text = '';
-    if(data.hocr){
-      // Extract only words with confidence >= 60
-      const wordRe = /x_wconf (\d+)[^>]*>([^<]+)</g;
-      const lineRe = /<span class='ocr_line[^']*'[^>]*>([\s\S]*?)<\/span>/g;
-      let lm;
-      while((lm=lineRe.exec(data.hocr))!==null){
-        const words=[]; let wm;
-        wordRe.lastIndex=0;
-        while((wm=wordRe.exec(lm[1]))!==null){
-          if(parseInt(wm[1])>=60 && wm[2].trim()) words.push(wm[2].trim());
-        }
-        if(words.length) text+=words.join(' ')+'\n';
-      }
-    } else {
-      text = data.text;
-    }
-    text = text.trim();
-    document.getElementById('raw').style.display='block';
-    document.getElementById('raw').textContent='📄 Raw: '+text;
-    if(!text||text.length<8){ setDot('live'); setStatus('No text found — hold label closer','warn'); busy=false; return; }
-    const parsed = parseAddress(text);
-    if(!parsed.name&&!parsed.city&&!parsed.zip){ setDot('live'); setStatus('Text found but address unclear — try again','warn'); }
-    else populate(parsed);
-  } catch(e){
-    setDot('live'); setStatus('OCR error — try again','err');
-  }
-  busy=false;
-}
 
 // ── CAMERA ────────────────────────────────────────────────────────
 const FRAME={x:.10,y:.06,w:.80,h:.88};
+
 async function startScanner(){
+  if(!apiKey){alert('Please enter your OCR.space API key first.');return;}
   try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}
+    });
     const v=document.getElementById('video');
     v.srcObject=stream; v.style.display='block';
     document.getElementById('placeholder').style.display='none';
     document.getElementById('overlay').style.display='block';
     document.getElementById('hint').style.display='block';
     setDot('live');
-    await ensureWorker();
     setStatus('Hold label inside the frame — scanning every 5s...');
-    scanTimer=setInterval(capture,5000);
-    setTimeout(capture,2500);
-  } catch(e){ setStatus('Camera access denied — allow camera and refresh','err'); }
+    scanTimer=setInterval(captureAndScan,5000);
+    setTimeout(captureAndScan,2500);
+  } catch(e){
+    setStatus('Camera access denied — allow camera and refresh','err');
+  }
 }
 
-async function capture(){
-  if(busy||done) return;
-  const v=document.getElementById('video'), c=document.getElementById('canvas');
-  if(!v.videoWidth) return;
+function captureFrame(){
+  const v=document.getElementById('video'),c=document.getElementById('canvas');
+  if(!v.videoWidth) return null;
   const vw=v.videoWidth,vh=v.videoHeight;
   c.width=Math.round(FRAME.w*vw); c.height=Math.round(FRAME.h*vh);
   c.getContext('2d').drawImage(v,Math.round(FRAME.x*vw),Math.round(FRAME.y*vh),c.width,c.height,0,0,c.width,c.height);
-  busy=true; setDot('scanning'); setStatus('Processing...','scanning');
-  await runOCR(preprocess(c));
+  return c.toDataURL('image/jpeg',0.92).split(',')[1];
 }
 
-// ── FIX PHONE DIGITS ─────────────────────────────────────────────
-function fixPhone(s){ return s.replace(/[oO]/g,'0').replace(/[iIlL|!]/g,'1').replace(/[gqG]/g,'9').replace(/[bB]/g,'8').replace(/[sS]/g,'5').replace(/[^0-9]/g,''); }
+async function captureAndScan(){
+  if(busy||done) return;
+  const b64=captureFrame();
+  if(!b64) return;
+  await scanWithOCRSpace(b64,'image/jpeg');
+}
+
+// ── OCR.SPACE API ─────────────────────────────────────────────────
+async function scanWithOCRSpace(base64data, mimeType){
+  if(busy||done) return;
+  busy=true;
+  setDot('scanning');
+  setStatus('Scanning with OCR.space...','scanning');
+
+  try{
+    const formData=new FormData();
+    formData.append('apikey', apiKey);
+    formData.append('base64Image', 'data:'+mimeType+';base64,'+base64data);
+    formData.append('language', 'eng');
+    formData.append('isOverlayRequired', 'false');
+    formData.append('detectOrientation', 'true');
+    formData.append('scale', 'true');          // auto-scale for better accuracy
+    formData.append('OCREngine', '2');         // Engine 2 = more accurate for printed text
+
+    const resp=await fetch('https://api.ocr.space/parse/image',{method:'POST',body:formData});
+    const data=await resp.json();
+
+    if(data.IsErroredOnProcessing){
+      setDot('live');
+      setStatus('OCR error: '+data.ErrorMessage,'err');
+      busy=false; return;
+    }
+
+    const text=data.ParsedResults?.[0]?.ParsedText?.trim()||'';
+    document.getElementById('raw').style.display='block';
+    document.getElementById('raw').textContent='📄 Raw: '+text;
+
+    if(!text||text.length<8){
+      setDot('live');
+      setStatus('No text found — hold label closer and steady','warn');
+      busy=false; return;
+    }
+
+    const parsed=parseIndianAddress(text);
+    if(!parsed.name&&!parsed.city&&!parsed.zip){
+      setDot('live');
+      setStatus('Text found but address unclear — try again','warn');
+    } else {
+      populate(parsed);
+    }
+  } catch(e){
+    setDot('live');
+    setStatus('Network error — check connection','err');
+  }
+  busy=false;
+}
 
 // ── ADDRESS PARSER ────────────────────────────────────────────────
-function parseAddress(text){
+function fixPhone(s){
+  return s.replace(/[oO]/g,'0').replace(/[iIlL|!]/g,'1').replace(/[gqG]/g,'9')
+          .replace(/[bB]/g,'8').replace(/[sS]/g,'5').replace(/[^0-9]/g,'');
+}
+
+function parseIndianAddress(text){
   const r={name:'',street1:'',street2:'',city:'',state:'',zip:'',mobile:''};
   const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>1);
   const used=new Set();
 
   lines.forEach((line,i)=>{
+    // PIN
     const pin=line.match(/\b(\d{6})\b/);
     if(pin&&!r.zip) r.zip=pin[1];
 
+    // Mobile
     const mob=line.match(/(?:mobile|number|mob|ph)[^0-9a-z]*([a-zA-Z0-9]{8,})/i);
-    if(mob&&!r.mobile){ const f=fixPhone(mob[1]); if(f.length>=10){r.mobile=f.slice(-10);used.add(i);} }
-    if(!r.mobile&&/^[a-zA-Z0-9\s]{9,13}$/.test(line)&&/\d{5,}/.test(line)){ const f=fixPhone(line); if(f.length>=10){r.mobile=f.slice(-10);used.add(i);} }
+    if(mob&&!r.mobile){const f=fixPhone(mob[1]);if(f.length>=10){r.mobile=f.slice(-10);used.add(i);}}
+    if(!r.mobile&&/^[a-zA-Z0-9\s]{9,13}$/.test(line)&&/\d{5,}/.test(line)){const f=fixPhone(line);if(f.length>=10){r.mobile=f.slice(-10);used.add(i);}}
 
+    // State
     const st=line.match(/^state[^a-z]*([a-z\s]+)/i);
     if(st&&!r.state){r.state=st[1].trim();used.add(i);}
 
-    if(/house|flat|plot|door|h\.?no|villa|block/i.test(line)&&!r.street1){r.street1=line.replace(/house\s*no\s*[-:]/i,'House No.').trim();used.add(i);}
-    if(/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|phase|devipura|vijay)/i.test(line)&&!r.street2){r.street2=line.trim();used.add(i);}
+    // House
+    if(/house|flat|plot|door|h\.?no|villa|block/i.test(line)&&!r.street1){
+      r.street1=line.replace(/house\s*no\s*[-:]/i,'House No.').trim();used.add(i);
+    }
 
-    if(pin&&!r.city){ const g=line.replace(pin[0],'').replace(/pin\s*code/i,'').replace(/,/g,'').trim(); if(g.length>2){r.city=g;used.add(i);} }
+    // Area
+    if(/(nagar|colony|sector|vihar|puram|enclave|marg|road|street|layout|phase|devipura|vijay)/i.test(line)&&!r.street2){
+      r.street2=line.trim();used.add(i);
+    }
+
+    // City from PIN line
+    if(pin&&!r.city){
+      const g=line.replace(pin[0],'').replace(/pin\s*code/i,'').replace(/,/g,'').trim();
+      if(g.length>2){r.city=g;used.add(i);}
+    }
   });
 
-  if(!r.city){ lines.forEach((line,i)=>{ if(!used.has(i)&&!r.city&&line.length>3&&line.length<25&&/^[A-Z]/.test(line)&&!/order|ordee|pin|mobile|state|\d/i.test(line)){r.city=line.trim();used.add(i);} }); }
-  for(let i=0;i<lines.length;i++){ if(!used.has(i)&&!r.name){ const l=lines[i]; if(l.length>3&&!/pin|state|mobile|order|ordee|\d{5}/i.test(l)){r.name=l;break;} } }
+  // City fallback
+  if(!r.city){
+    lines.forEach((line,i)=>{
+      if(!used.has(i)&&!r.city&&line.length>3&&line.length<25&&/^[A-Z]/.test(line)&&!/order|ordee|pin|mobile|state|\d/i.test(line)){
+        r.city=line.trim();used.add(i);
+      }
+    });
+  }
+
+  // Name
+  for(let i=0;i<lines.length;i++){
+    if(!used.has(i)&&!r.name){
+      const l=lines[i];
+      if(l.length>3&&!/pin|state|mobile|order|ordee|\d{5}/i.test(l)){r.name=l;break;}
+    }
+  }
 
   Object.keys(r).forEach(k=>{r[k]=r[k].replace(/\s+/g,' ').trim();});
   return r;
 }
 
+// ── POPULATE ──────────────────────────────────────────────────────
 function populate(addr){
-  const map={'f-name':addr.name,'f-street1':addr.street1,'f-street2':addr.street2,'f-city':addr.city,'f-state':addr.state,'f-zip':addr.zip,'f-mobile':addr.mobile};
-  Object.entries(map).forEach(([id,val])=>{ const el=document.getElementById(id); if(el&&val){el.value=val;el.classList.add('filled');} });
+  const map={'f-name':addr.name,'f-street1':addr.street1,'f-street2':addr.street2,
+             'f-city':addr.city,'f-state':addr.state,'f-zip':addr.zip,'f-mobile':addr.mobile};
+  Object.entries(map).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el&&val){el.value=val;el.classList.add('filled');}
+  });
   done=true;
   clearInterval(scanTimer);
   if(stream) stream.getTracks().forEach(t=>t.stop());
   document.getElementById('video').style.display='none';
   document.getElementById('overlay').style.display='none';
   document.getElementById('hint').style.display='none';
-  setDot('done'); setStatus('Address detected and filled in!','ok');
+  setDot('done');
+  setStatus('Address detected and filled in!','ok');
   document.getElementById('btn-save').disabled=false;
   document.getElementById('rescan-btn').style.display='block';
 }
@@ -391,27 +429,28 @@ function rescan(){
 }
 
 function clearAll(){
-  ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile'].forEach(id=>{const el=document.getElementById(id);el.value='';el.classList.remove('filled');});
+  ['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile'].forEach(id=>{
+    const el=document.getElementById(id);el.value='';el.classList.remove('filled');
+  });
   document.getElementById('btn-save').disabled=true;
   document.getElementById('success').style.display='none';
   document.getElementById('raw').style.display='none';
-  done=false; busy=false;
+  done=false;busy=false;
   clearInterval(scanTimer);
   if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
   document.getElementById('video').style.display='none';
   document.getElementById('overlay').style.display='none';
   document.getElementById('hint').style.display='none';
   document.getElementById('placeholder').style.display='flex';
-  uploadImg=null;
   document.getElementById('preview-img').style.display='none';
-  document.getElementById('btn-scan-img').style.display='none';
   document.getElementById('file-input').value='';
-  setDot(''); document.getElementById('dot-label').textContent='ready';
+  setDot('');document.getElementById('dot-label').textContent='ready';
   setStatus(tab==='camera'?'Press start to activate camera':'Tap the box to choose a label image');
 }
 
 function saveAddr(){
-  const v=['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile'].map(id=>document.getElementById(id).value).filter(Boolean).join(', ');
+  const v=['f-name','f-street1','f-street2','f-city','f-state','f-zip','f-mobile']
+    .map(id=>document.getElementById(id).value).filter(Boolean).join(', ');
   document.getElementById('saved-text').textContent=v;
   document.getElementById('success').style.display='block';
 }
