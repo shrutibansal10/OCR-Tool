@@ -305,7 +305,7 @@ async function scanWithOCRSpace(base64data, mimeType){
     formData.append('scale', 'true');          // auto-scale for better accuracy
     formData.append('OCREngine', '2');         // Engine 2 = more accurate for printed text
 
-    const resp=await fetch('https://api.ocr.space/parse/image',{method:'POST',body:formData});
+    const resp=await fetch('https://api.ocr.space/parse/image',{method:'POST',body:formData,mode:'cors'});
     const data=await resp.json();
 
     if(data.IsErroredOnProcessing){
@@ -333,7 +333,9 @@ async function scanWithOCRSpace(base64data, mimeType){
     }
   } catch(e){
     setDot('live');
-    setStatus('Network error — check connection','err');
+    setStatus('Error: '+e.message,'err');
+    document.getElementById('raw').style.display='block';
+    document.getElementById('raw').textContent='Error detail: '+e.toString();
   }
   busy=false;
 }
